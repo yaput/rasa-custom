@@ -348,7 +348,7 @@ class NLG():
             return [default_response], "text"
 
 from pydashbot.tracker import Tracker
-from .blue_config import load_config
+from .config import load_config
 from flask import Flask, Response, request
 
 config = load_config()

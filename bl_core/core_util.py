@@ -20,6 +20,15 @@ def send_quickreplies(session_id, quickreplies):
         "input_disable": quickreplies[0].get('input_disable', 'false'),
     }
 
+def send_nothing(session_id, data):
+    return {
+        "channel":"socket",
+        "user": session_id,
+        "to": session_id,
+        "type":"skip_this",
+        "input_disable": 'false',
+    }
+
 def send_carousel(session_id, carousel_data):
     return {
         "type":"carousel",
@@ -283,6 +292,7 @@ def parse_bot_response(response):
         'restart_session': send_restart_session,
         'end_session': send_end_session,
         "newlink": send_new_link,
+        'send_nothing': send_nothing,
     }
     if 'text' in response.keys():
         return send_text(session_id, response['text'])
