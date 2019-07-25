@@ -20,7 +20,7 @@ from rasa_core.utils import EndpointConfig
 from rasa_core.tracker_store import MongoTrackerStore
 from rasa_core.domain import Domain
 
-from .blue_config import load_config
+from .config import load_config
 from .core_util import parse_bot_response, send_typing
 
 from pydashbot.tracker import Tracker
