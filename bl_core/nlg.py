@@ -11,7 +11,7 @@ class NLG():
         self.DEFAULT_ERROR_RESPONSE = 'utter_default_error'
 
         self.config = config
-        with open('./data/%s/database/master/response.json' % config["template"]["module"]) as temp:
+        with open('%s' % config["response"]["path"]) as temp:
             self.response_template = json.load(temp)
         self.request_data = None
         return

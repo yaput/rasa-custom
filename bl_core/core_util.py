@@ -141,6 +141,12 @@ def send_account_form(session_id, message=None):
         "channel": "socket"
     }
 
+def send_sound(session_id, message=None):
+    return {
+        "type": "new_component",
+        "channel": "socket"
+    }
+
 def send_typing():
     return {"type":"typing"}
 
@@ -293,6 +299,7 @@ def parse_bot_response(response):
         'end_session': send_end_session,
         "newlink": send_new_link,
         'send_nothing': send_nothing,
+        "send_sound": send_sound,
     }
     if 'text' in response.keys():
         return send_text(session_id, response['text'])
