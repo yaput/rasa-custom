@@ -151,6 +151,8 @@ def send_typing():
     return {"type":"typing"}
 
 def send_search_bar(session_id, data):
+    if isinstance(list, data):
+        data = data[0]
     items = []
     for d in data['data']:
         items.append({
