@@ -23,7 +23,7 @@ from rasa_core.domain import Domain
 from .config import load_config
 from .core_util import parse_bot_response, send_typing
 
-from pydashbot.tracker import Tracker
+from .tracker import Tracker
 from .user_map import (isPause, pause_user, pop_user, send_message, store_user,
                       user_map, UserTracker, update_lang)
 
