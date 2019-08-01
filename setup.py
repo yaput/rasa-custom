@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='bl_core',
-      version='0.5.1',
+      version='0.5.3',
       description='Blue Logic Core Bot Package',
       url='',
       author='Blue Logic',
@@ -9,8 +9,8 @@ setup(name='bl_core',
       license='MIT',
       packages=['bl_core'],
       install_requires=[
-          'rasa-core==0.14.4',
-          'rasa-core-sdk==0.14.0',
+          'rasa==1.1.8',
+          'rasa-sdk==1.1.0',
           'flask',
           'gevent-websocket',
           'waitress'

@@ -141,12 +141,6 @@ def send_account_form(session_id, message=None):
         "channel": "socket"
     }
 
-def send_sound(session_id, message=None):
-    return {
-        "type": "new_component",
-        "channel": "socket"
-    }
-
 def send_typing():
     return {"type":"typing"}
 
@@ -175,6 +169,16 @@ def send_dynamic_form(session_id, data):
         "data": {
             "fields": data
         }
+    }
+
+def send_sound(session_id, data):
+    d = data[0]
+    return {
+        "is_received": True,
+        "type": "sound_tract",
+        "text": data['text'],
+        "channel": "socket",
+        "link": data['sound']
     }
 
 def send_get_user_location(session_id, data):

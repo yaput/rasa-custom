@@ -13,12 +13,13 @@ from flask import Flask, Response, request
 from gevent.pywsgi import WSGIServer
 from geventwebsocket.handler import WebSocketHandler
 from geventwebsocket.websocket import WebSocketError
-from rasa_core.agent import Agent
-from rasa_core.channels import UserMessage
-from rasa_core.interpreter import RasaNLUInterpreter
-from rasa_core.utils import EndpointConfig
-from rasa_core.tracker_store import MongoTrackerStore
-from rasa_core.domain import Domain
+from rasa.core.agent import Agent
+from rasa.core.channels import UserMessage
+from rasa.core.interpreter import RasaNLUHttpInterpreter
+from rasa.core.interpreter import RasaNLUInterpreter
+from rasa.utils.endpoints import EndpointConfig
+from rasa.core.tracker_store import MongoTrackerStore
+from rasa.core.domain import Domain
 
 from .config import load_config
 from .core_util import parse_bot_response, send_typing
@@ -37,14 +38,14 @@ dashlog = Tracker(config['dashbot']['api'],config['dashbot'][config["template"][
 
 
 
-nlu_interpreter = RasaNLUInterpreter('./models/'+config['template']['module']+'/nlu/global/latest')
+nlu_interpreter = RasaNLUInterpreter('./models/nlu/latest/')
 action_endpoint = EndpointConfig(url=config['server']['actions_endpoint'])
 nlg_endpoint = EndpointConfig(url=config['server']['nlg_endpoint'])
 domain = Domain.load('./data/'+config['template']['module']+'/domain.yml')
 db_conf = config['bluelog']
 mongo_tracker = MongoTrackerStore(domain, host=db_conf['host'], db=db_conf['db'], username=db_conf['username'], password=db_conf['password'], auth_source=db_conf['authsource'], collection=config['template']['module'])
 
-agent = Agent.load('./models/'+config['template']['module']+'/dialogue', interpreter=nlu_interpreter, action_endpoint=action_endpoint,generator=nlg_endpoint, tracker_store=mongo_tracker)
+agent = Agent.load('./models/dialogue', interpreter=nlu_interpreter, action_endpoint=action_endpoint,generator=nlg_endpoint, tracker_store=mongo_tracker)
 
 
 @app.route("/pause", methods=['POST'])
@@ -98,15 +99,17 @@ def handle_websocket(websocket):
                     text_message = '/session_started{"language": "'+split_txt[3]+'"}'
 
                 msgRasa = UserMessage(sender_id=session_message,text=text_message)
-                t = agent.log_message(msgRasa)
-                slots = t.current_slot_values()
-                update_lang(session_message, slots['language'])
+                # # t = await agent.log_message(msgRasa)
+                # # slots = t.current_slot_values()
+                # update_lang(session_message, slots['language'])
                 
                 if text_message == "/restart" or text_message == "restart":
                     pause_user(session_message, pause=False)
 
                 if not isPause(session_message):
-                    responses = agent.handle_message(msgRasa)
+                    loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(loop)
+                    responses = loop.run_until_complete(agent.handle_message(msgRasa))
                     for response in responses:
                         dashlog.log("outgoing", response,response['recipient_id'])
                         time.sleep(1)
