@@ -305,7 +305,7 @@ def parse_bot_response(response):
         'end_session': send_end_session,
         "newlink": send_new_link,
         'send_nothing': send_nothing,
-        "send_sound": send_sound,
+        "sound_text": send_sound,
     }
     if 'text' in response.keys():
         return send_text(session_id, response['text'])

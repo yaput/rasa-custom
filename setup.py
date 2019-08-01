@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='bl_core',
-      version='0.5.3',
+      version='0.5.4',
       description='Blue Logic Core Bot Package',
       url='',
       author='Blue Logic',
