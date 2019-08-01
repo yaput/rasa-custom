@@ -72,7 +72,8 @@ def wsgi_app(environ, start_response):
     if path == "/ws":
         try:  
             handle_websocket(environ["wsgi.websocket"])
-        except:
+        except Exception as e:
+            print(e)
             print("Stop Connection")
         return []
     else:  

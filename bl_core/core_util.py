@@ -145,7 +145,7 @@ def send_typing():
     return {"type":"typing"}
 
 def send_search_bar(session_id, data):
-    if isinstance(list, data):
+    if isinstance(data, list):
         data = data[0]
     items = []
     for d in data['data']:
@@ -176,9 +176,9 @@ def send_sound(session_id, data):
     return {
         "is_received": True,
         "type": "sound_tract",
-        "text": data['text'],
+        "text": d['text'],
         "channel": "socket",
-        "link": data['sound']
+        "link": d['sound']
     }
 
 def send_get_user_location(session_id, data):
