@@ -173,13 +173,17 @@ def send_dynamic_form(session_id, data):
 
 def send_sound(session_id, data):
     d = data[0]
-    return {
+    payload = {
         "is_received": True,
         "type": "sound_tract",
         "text": d['text'],
         "channel": "socket",
         "link": d['sound']
     }
+    if 'replies' in d.keys():
+        payload["quick_replies"] = d['replies']
+    print(payload)
+    return payload
 
 def send_get_user_location(session_id, data):
     return {

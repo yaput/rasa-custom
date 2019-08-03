@@ -112,10 +112,12 @@ def handle_websocket(websocket):
                     asyncio.set_event_loop(loop)
                     responses = loop.run_until_complete(agent.handle_message(msgRasa))
                     for response in responses:
+                        delay = config['delay_time']
+                        if response['attachment']['type'] != "sound_text" and delay > 4:
+                            delay = 2.5
                         dashlog.log("outgoing", response,response['recipient_id'])
-                        time.sleep(1)
                         websocket.send(json.dumps(send_typing()))
-                        time.sleep(1.5)
+                        time.sleep(delay)
                         parsed_message = parse_bot_response(response)
                         websocket.send(json.dumps(parsed_message))
                 else:
