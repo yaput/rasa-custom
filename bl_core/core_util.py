@@ -278,6 +278,16 @@ def send_new_link(session_id, data):
            }]
       }
 
+def send_download(session_id, data):
+    file_send = data[0]
+    return {
+        "is_received": True,
+        "type": "download",
+        "text": "download",
+        "channel": "socket",
+        "data":[{"filename": file_send}]
+    }
+
 def parse_bot_response(response):
     session_id = response['recipient_id']
     map_attachment_response = {
@@ -310,6 +320,7 @@ def parse_bot_response(response):
         "newlink": send_new_link,
         'send_nothing': send_nothing,
         "sound_text": send_sound,
+        "download": send_download,
     }
     if 'text' in response.keys():
         return send_text(session_id, response['text'])
