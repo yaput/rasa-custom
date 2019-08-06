@@ -11,7 +11,7 @@ def request_query(query='', session_id=''):
 
 def send_quickreplies(session_id, quickreplies):
     return {
-        "text": quickreplies[0]['text'],
+        "text": quickreplies[0].get('text',""),
         "quick_replies": quickreplies[0]['replies'],
         "channel":"socket",
         "user": session_id,

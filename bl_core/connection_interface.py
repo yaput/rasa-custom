@@ -38,14 +38,14 @@ dashlog = Tracker(config['dashbot']['api'],config['dashbot'][config["template"][
 
 
 
-nlu_interpreter = RasaNLUInterpreter('./models/nlu/latest/')
+nlu_interpreter = RasaNLUInterpreter('./models/nlu/')
 action_endpoint = EndpointConfig(url=config['server']['actions_endpoint'])
 nlg_endpoint = EndpointConfig(url=config['server']['nlg_endpoint'])
 domain = Domain.load('./data/'+config['template']['module']+'/domain.yml')
 db_conf = config['bluelog']
 mongo_tracker = MongoTrackerStore(domain, host=db_conf['host'], db=db_conf['db'], username=db_conf['username'], password=db_conf['password'], auth_source=db_conf['authsource'], collection=config['template']['module'])
 
-agent = Agent.load('./models/dialogue', interpreter=nlu_interpreter, action_endpoint=action_endpoint,generator=nlg_endpoint, tracker_store=mongo_tracker)
+agent = Agent.load('./models/', action_endpoint=action_endpoint,generator=nlg_endpoint, tracker_store=mongo_tracker)
 
 
 @app.route("/pause", methods=['POST'])
