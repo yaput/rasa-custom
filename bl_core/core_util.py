@@ -346,7 +346,7 @@ def sendMail(to, message_text, subject, cc =[], filename=""):
     message_text = message_text
     msg.attach(MIMEText(message_text, 'plain'))
     if filename != "":
-        with open(filename, encoding='UTF-8') as f:
+        with open(filename) as f:
             attachment = MIMEText(f.read())
             attachment.add_header('Content-Disposition', 'attachment', filename=filename)           
             msg.attach(attachment)

@@ -96,7 +96,7 @@ def handle_websocket(websocket, lang):
             while True:
                 msg = websocket.receive()
                 try:
-                    message = json.loads(msg,format="utf-8")
+                    message = json.loads(msg)
                 except:
                     break
                 session_message = message['user']

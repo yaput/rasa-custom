@@ -2,7 +2,7 @@ import json, time
 from .config import load_config
 config = load_config()
 template_message = None
-with open('./data/%s/database/master/response.json' % config["template"]["module"], encoding='UTF-8') as temp:
+with open('./data/%s/database/master/response.json' % config["template"]["module"]) as temp:
     template_message = json.load(temp)
 
 user_map = {}
