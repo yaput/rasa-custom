@@ -11,8 +11,8 @@ class NLG():
         self.DEFAULT_ERROR_RESPONSE = 'utter_default_error'
 
         self.config = config
-        with open('%s' % config["response"]["path"], encoding="cp850", errors='ignore') as temp:
-            self.response_template = json.load(temp)
+        with open('%s' % config["response"]["path"], encoding="utf-8", errors='ignore') as temp:
+            self.response_template = json.load(temp, format="utf-8")
         self.request_data = None
         return
 
@@ -119,7 +119,7 @@ class NLG():
             else:
                 resp = requests.get(self._replace_template_with_value(url))
 
-            data = json.loads(resp.text)
+            data = json.loads(resp.text, format="utf-8")
             
             # temp_element = []
             postbacks = []
@@ -355,8 +355,8 @@ config = load_config()
 response_template = None
 n = NLG(config)
 dashlog = Tracker(config['dashbot']['api'],config['dashbot'][config["template"]["module"]]['api_key'])
-with open('%s' % config["response"]["path"], encoding="cp850", errors='ignore') as temp:
-    response_template = json.load(temp)
+with open('%s' % config["response"]["path"], encoding="utf-8", errors='ignore') as temp:
+    response_template = json.load(temp,format="utf-8")
 
 app = Flask(__name__)
 
