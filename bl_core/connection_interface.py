@@ -38,14 +38,15 @@ dashlog = Tracker(config['dashbot']['api'],config['dashbot'][config["template"][
 
 
 
-nlu_interpreter = RasaNLUInterpreter('./models/nlu/')
+# nlu_interpreter = RasaNLUInterpreter('./models/nlu/')
 action_endpoint = EndpointConfig(url=config['server']['actions_endpoint'])
 nlg_endpoint = EndpointConfig(url=config['server']['nlg_endpoint'])
 domain = Domain.load('./data/'+config['template']['module']+'/domain.yml')
 db_conf = config['bluelog']
 mongo_tracker = MongoTrackerStore(domain, host=db_conf['host'], db=db_conf['db'], username=db_conf['username'], password=db_conf['password'], auth_source=db_conf['authsource'], collection=config['template']['module'])
 
-agent = Agent.load('./models/', action_endpoint=action_endpoint,generator=nlg_endpoint, tracker_store=mongo_tracker)
+agent_en = Agent.load('./models/model_en.tar.gz', action_endpoint=action_endpoint,generator=nlg_endpoint, tracker_store=mongo_tracker)
+agent_ar = Agent.load('./models/model_ar.tar.gz', action_endpoint=action_endpoint,generator=nlg_endpoint, tracker_store=mongo_tracker)
 
 
 @app.route("/pause", methods=['POST'])
@@ -69,16 +70,26 @@ def liveperson():
 
 def wsgi_app(environ, start_response):  
     path = environ["PATH_INFO"]  
-    if path == "/ws":
+    if path == "/ws/en":
         try:  
-            handle_websocket(environ["wsgi.websocket"])
+            handle_websocket(environ["wsgi.websocket"], "en")
+        except Exception as e:
+            print(e)
+            print("Stop Connection")
+        return []
+    elif path == '/ws/ar':
+        try:  
+            handle_websocket(environ["wsgi.websocket"], "ar")
         except Exception as e:
             print(e)
             print("Stop Connection")
         return []
     else:  
         return app(environ, start_response)  
-def handle_websocket(websocket):
+def handle_websocket(websocket, lang):
+    agent = agent_en
+    if lang == "ar":
+        agent = agent_ar
     session_message = None
     if websocket != None:
         try:
