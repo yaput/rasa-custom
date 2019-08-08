@@ -284,6 +284,19 @@ def send_download(session_id, data):
         "data":[{"filename": file_send}]
     }
 
+def send_tenancy_form(session_id, data):
+    form_data = data[0]
+    return {
+        "type": "tenancy_form",
+         "channel": "socket",
+         "content": {
+            "text": form_data['text'],
+            "type": "tenancy_form",
+            "input_disable": "true",
+            "data": form_data['data']
+         }
+    }
+
 def parse_bot_response(response):
     session_id = response['recipient_id']
     map_attachment_response = {
@@ -317,6 +330,7 @@ def parse_bot_response(response):
         'send_nothing': send_nothing,
         "sound_text": send_sound,
         "download": send_download,
+        "tenancy_form": send_tenancy_form,
     }
     if 'text' in response.keys():
         return send_text(session_id, response['text'])
