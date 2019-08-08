@@ -46,8 +46,8 @@ domain = Domain.load('./data/'+config['template']['module']+'/domain.yml')
 db_conf = config['bluelog']
 mongo_tracker = MongoTrackerStore(domain, host=db_conf['host'], db=db_conf['db'], username=db_conf['username'], password=db_conf['password'], auth_source=db_conf['authsource'], collection=config['template']['module'])
 
-agent_en = Agent.load('./models/core.tar.gz', interpreter=nlu_interpreter_en, action_endpoint=action_endpoint,generator=nlg_endpoint, tracker_store=mongo_tracker)
-agent_ar = Agent.load('./models/core.tar.gz', interpreter=nlu_interpreter_ar, action_endpoint=action_endpoint,generator=nlg_endpoint, tracker_store=mongo_tracker)
+agent_en = Agent.load('./models/core/core.tar.gz', interpreter=nlu_interpreter_en, action_endpoint=action_endpoint,generator=nlg_endpoint, tracker_store=mongo_tracker)
+agent_ar = Agent.load('./models/core/core.tar.gz', interpreter=nlu_interpreter_ar, action_endpoint=action_endpoint,generator=nlg_endpoint, tracker_store=mongo_tracker)
 
 
 @app.route("/pause", methods=['POST'])
