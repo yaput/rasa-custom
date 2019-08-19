@@ -131,7 +131,18 @@ class NLG():
                 split_text = e['output']['elements']['split_text']
             if '$' in e['output']['elements']['value']:
                 val_lookup = e['output']['elements']['value'].replace("$","").split(".")
-                if isinstance(data[val_lookup[0]], list):
+                if isinstance(data, list):
+                    for d in data:
+                        v = None
+                        v_temp = d[val_lookup[0]]
+                        for f in val_lookup[1:]:
+                            v = v_temp[f]
+                        
+
+                        if embed != "":
+                            v = embed.replace('@',v)
+                        postbacks.append(v)
+                elif isinstance(data[val_lookup[0]], list):
                     for d in range(len(data[val_lookup[0]])):
                         v = None
                         v_temp = data[val_lookup[0]][d]
@@ -156,7 +167,15 @@ class NLG():
             labels = []
             if '$' in e['output']['elements']['text']:
                 text_lookup = e['output']['elements']['text'].replace("$","").split(".")
-                if isinstance(data[text_lookup[0]], list):
+                if isinstance(data, list):
+                    for d in data:
+                        t = None
+                        t_temp = d[text_lookup[0]]
+                        for f in text_lookup[1:]:
+                            t = t_temp[f]
+
+                        labels.append(t)
+                elif isinstance(data[text_lookup[0]], list):
                     for d in range(len(data[text_lookup[0]])):
                         t = None
                         t_temp = data[text_lookup[0]][d]
@@ -176,7 +195,15 @@ class NLG():
             subtitle = []
             if '$' in e['output']['elements']['sub_text']:
                 subtext_lookup = e['output']['elements']['sub_text'].replace("$","").split(".")
-                if isinstance(data[subtext_lookup[0]], list):
+                if isinstance(data, list):
+                    for d in data:
+                        st = None
+                        st_temp = d[subtext_lookup[0]]
+                        for f in subtext_lookup[1:]:
+                            st = st_temp[f]
+
+                        subtitle.append(st)
+                elif isinstance(data[subtext_lookup[0]], list):
                     for d in range(len(data[subtext_lookup[0]])):
                         st = None
                         st_temp = data[subtext_lookup[0]][d]
@@ -199,7 +226,18 @@ class NLG():
                 img_embed = e['output']['elements']['img_embed']
             if '$' in e['output']['elements']['image']:
                 img_lookup = e['output']['elements']['image'].replace("$","").split(".")
-                if isinstance(data[img_lookup[0]], list):
+                if isinstance(data, list):
+                    for d in data:
+                        i = None
+                        i_temp = d[img_lookup[0]]
+                        for f in img_lookup[1:]:
+                            i = i_temp[f]
+
+                        if img_embed != "":
+                            images.append(img_embed.replace('@',i))
+                        else:
+                            images.append(i)
+                elif isinstance(data[img_lookup[0]], list):
                     for d in range(len(data[img_lookup[0]])):
                         i = None
                         i_temp = data[img_lookup[0]][d]
@@ -229,7 +267,15 @@ class NLG():
             btn_text = []
             if '$' in btn['text']:
                 btn_text_lookup = btn['text'].replace("$","").split(".")
-                if isinstance(data[btn_text_lookup[0]], list):
+                if isinstance(data, list):
+                    for d in data:
+                        bt = None
+                        bt_temp = d[btn_text_lookup[0]]
+                        for f in btn_text_lookup[1:]:
+                            bt = bt_temp[f]
+
+                        btn_text.append(bt)
+                elif isinstance(data[btn_text_lookup[0]], list):
                     for d in range(len(data[btn_text_lookup[0]])):
                         bt = None
                         bt_temp = data[btn_text_lookup[0]][d]
@@ -253,6 +299,16 @@ class NLG():
             btn_payload = []
             if '$' in btn['payload']:
                 btn_payload_lookup = btn['payload'].replace("$","").split(".")
+                if isinstance(data, list):
+                    for d in data:
+                        bp = None
+                        bp_temp = d[btn_payload_lookup[0]]
+                        for f in btn_payload_lookup[1:]:
+                            bp = bp_temp[f]
+                        
+                        if btn['embed'] != "":
+                            bp = btn['embed'].replace('@',bp)
+                        btn_payload.append(bp)
                 if isinstance(data[btn_payload_lookup[0]], list):
                     for d in range(len(data[btn_payload_lookup[0]])):
                         bp = None
