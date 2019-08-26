@@ -1,5 +1,6 @@
 import json, time
 from .config import load_config
+from .core_util import parse_bot_response
 config = load_config()
 template_message = None
 with open('./data/%s/database/master/response.json' % config["template"]["module"]) as temp:
@@ -98,9 +99,9 @@ class UserTracker(threading.Thread):
                 "attachment": template_message['utter_session_timeout'][user_map[t]['language']]['content']
             }
             try:
-                user_map[t]['conn'].send(json.dumps(core_util.parse_bot_response(response)))
-            except:
-                print("Websocket Closed")
+                user_map[t]['conn'].send(json.dumps(parse_bot_response(response)))
+            except Exception as e:
+                print(e.args)
                 pass
             pop_user(t)
 
