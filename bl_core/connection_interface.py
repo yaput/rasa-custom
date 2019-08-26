@@ -66,6 +66,10 @@ def liveperson():
     send_message(userID, req_data['text'])
     return Response("OK")
 
+@app.route("/check", methods=['GET'])
+def check():
+    return Response("Aster UAE")
+
 def wsgi_app(environ, start_response):  
     path = environ["PATH_INFO"]  
     if path == "/ws":
