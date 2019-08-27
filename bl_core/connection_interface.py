@@ -37,8 +37,7 @@ host,port='0.0.0.0',config['websocket']['port']
 dashlog = Tracker(config['dashbot']['api'],config['dashbot'][config["template"]["module"]]['api_key'])
 
 
-
-nlu_interpreter_ar = RasaNLUInterpreter('./models/nlu/ar/nlu')
+nlu_interpreter_idn = RasaNLUInterpreter('./models/nlu/idn/nlu')
 nlu_interpreter_en = RasaNLUInterpreter('./models/nlu/en/nlu')
 action_endpoint = EndpointConfig(url=config['server']['actions_endpoint'])
 nlg_endpoint = EndpointConfig(url=config['server']['nlg_endpoint'])
@@ -47,7 +46,7 @@ db_conf = config['bluelog']
 mongo_tracker = MongoTrackerStore(domain, host=db_conf['host'], db=db_conf['db'], username=db_conf['username'], password=db_conf['password'], auth_source=db_conf['authsource'], collection=config['template']['module'])
 
 agent_en = Agent.load('./models/core/core.tar.gz', interpreter=nlu_interpreter_en, action_endpoint=action_endpoint,generator=nlg_endpoint, tracker_store=mongo_tracker)
-agent_ar = Agent.load('./models/core/core.tar.gz', interpreter=nlu_interpreter_ar, action_endpoint=action_endpoint,generator=nlg_endpoint, tracker_store=mongo_tracker)
+agent_idn = Agent.load('./models/core/core.tar.gz', interpreter=nlu_interpreter_idn, action_endpoint=action_endpoint,generator=nlg_endpoint, tracker_store=mongo_tracker)
 
 
 @app.route("/pause", methods=['POST'])
@@ -78,9 +77,9 @@ def wsgi_app(environ, start_response):
             print(e)
             print("Stop Connection")
         return []
-    elif path == '/ws/ar':
+    elif path == '/ws/idn':
         try:  
-            handle_websocket(environ["wsgi.websocket"], "ar")
+            handle_websocket(environ["wsgi.websocket"], "idn")
         except Exception as e:
             print(e)
             print("Stop Connection")
@@ -89,8 +88,8 @@ def wsgi_app(environ, start_response):
         return app(environ, start_response)  
 def handle_websocket(websocket, lang):
     agent = agent_en
-    if lang == "ar":
-        agent = agent_ar
+    if lang == "idn":
+        agent = agent_idn
     session_message = None
     if websocket != None:
         try:
