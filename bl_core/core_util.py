@@ -171,6 +171,23 @@ def send_dynamic_form(session_id, data):
         }
     }
 
+
+def send_qr_code(session_id, data):
+    d = data[0]
+    return {
+        "is_received": True,
+        "type": "qrcode",
+        "service_name": d["service_name"],
+        "start_date": d["start_date"],
+        "start_time": d["start_time"],
+        "start_interval": d["start_interval"],
+        "customer_count": d["customer_in_queue"],
+        "approx_time": d["approx_time"],
+        "value": d["customer_token"],
+        "channel": "socket"
+    }
+
+
 def send_sound(session_id, data):
     d = data[0]
     return {
@@ -331,6 +348,7 @@ def parse_bot_response(response):
         "sound_text": send_sound,
         "download": send_download,
         "tenancy_form": send_tenancy_form,
+        "qrcode": send_qr_code,
     }
     if 'text' in response.keys():
         return send_text(session_id, response['text'])
