@@ -179,8 +179,6 @@ def send_qr_code(session_id, data):
         "type": "qrcode",
         "service_name": d["service_name"],
         "start_date": d["start_date"],
-        "start_time": d["start_time"],
-        "start_interval": d["start_interval"],
         "customer_count": d["customer_in_queue"],
         "approx_time": d["approx_time"],
         "value": d["customer_token"],
