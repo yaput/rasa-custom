@@ -44,10 +44,10 @@ action_endpoint = EndpointConfig(url=config['server']['actions_endpoint'])
 nlg_endpoint = EndpointConfig(url=config['server']['nlg_endpoint'])
 domain = Domain.load('./data/'+config['template']['module']+'/domain.yml')
 db_conf = config['bluelog']
-mongo_tracker = MongoTrackerStore(domain, host=db_conf['host'], db=db_conf['db'], username=db_conf['username'], password=db_conf['password'], auth_source=db_conf['authsource'], collection=config['template']['module'])
+# mongo_tracker = MongoTrackerStore(domain, host=db_conf['host'], db=db_conf['db'], username=db_conf['username'], password=db_conf['password'], auth_source=db_conf['authsource'], collection=config['template']['module'])
 
-agent_en = Agent.load('./models/core/core.tar.gz', interpreter=nlu_interpreter_en, action_endpoint=action_endpoint,generator=nlg_endpoint, tracker_store=mongo_tracker)
-agent_ar = Agent.load('./models/core/core.tar.gz', interpreter=nlu_interpreter_ar, action_endpoint=action_endpoint,generator=nlg_endpoint, tracker_store=mongo_tracker)
+agent_en = Agent.load('./models/core/core.tar.gz', interpreter=nlu_interpreter_en, action_endpoint=action_endpoint,generator=nlg_endpoint)
+agent_ar = Agent.load('./models/core/core.tar.gz', interpreter=nlu_interpreter_ar, action_endpoint=action_endpoint,generator=nlg_endpoint)
 
 
 @app.route("/pause", methods=['POST'])
@@ -112,9 +112,9 @@ def handle_websocket(websocket, lang):
                     text_message = '/session_started{"language": "'+split_txt[3]+'"}'
 
                 msgRasa = UserMessage(sender_id=session_message,text=text_message)
-                # # t = await agent.log_message(msgRasa)
-                # # slots = t.current_slot_values()
-                # update_lang(session_message, slots['language'])
+                t = agent.log_message(msgRasa)
+                slots = t.current_slot_values()
+                update_lang(session_message, slots['language'])
                 
                 if text_message == "/restart" or text_message == "restart":
                     pause_user(session_message, pause=False)
