@@ -130,7 +130,7 @@ def handle_websocket(websocket, lang):
                         time.sleep(1.5)
                         parsed_message = parse_bot_response(response)
                         websocket.send(json.dumps(parsed_message))
-                else:
+                # else:
                     # dashlog.log("incoming", None, session_message,queryText=text_message,intent_name='Human In The Loop')
         except WebSocketError as ex:
             print(ex)
