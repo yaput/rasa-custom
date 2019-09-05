@@ -288,13 +288,10 @@ def send_tenancy_form(session_id, data):
     form_data = data[0]
     return {
         "type": "tenancy_form",
-         "channel": "socket",
-         "content": {
-            "text": form_data['text'],
-            "type": "tenancy_form",
-            "input_disable": "true",
-            "data": form_data['data']
-         }
+        "channel": "socket",
+        "text": form_data['text']
+        "input_disable": "true",
+        "data": form_data['data']
     }
 
 def parse_bot_response(response):
