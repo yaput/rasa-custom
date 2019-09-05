@@ -293,7 +293,7 @@ def send_tenancy_form(session_id, data):
             "text": form_data['text'],
             "type": "tenancy_form",
             "input_disable": "true",
-            "data": [form_data['data']]
+            "data": form_data['data']
          }
     }
 
