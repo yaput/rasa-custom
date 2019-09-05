@@ -289,7 +289,7 @@ def send_tenancy_form(session_id, data):
     return {
         "type": "tenancy_form",
         "channel": "socket",
-        "text": form_data['text']
+        "text": form_data['text'],
         "input_disable": "true",
         "data": form_data['data']
     }
