@@ -33,7 +33,7 @@ app.debug = True
 
 config = load_config()
 host,port='0.0.0.0',config['websocket']['port']
-dashlog = Tracker(config['dashbot']['api'],config['dashbot'][config["template"]["module"]]['api_key'])
+dashlog = Tracker(config['dashbot'][config["template"]["module"]]['api_key'], 'web')
 
 
 

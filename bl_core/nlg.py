@@ -410,7 +410,7 @@ from flask import Flask, Response, request
 config = load_config()
 response_template = None
 n = NLG(config)
-dashlog = Tracker(config['dashbot']['api'],config['dashbot'][config["template"]["module"]]['api_key'])
+dashlog = Tracker(config['dashbot'][config["template"]["module"]]['api_key'], 'web')
 with open('%s' % config["response"]["path"]) as temp:
     response_template = json.load(temp)
 
