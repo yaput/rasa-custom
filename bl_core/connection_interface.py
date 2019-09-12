@@ -113,7 +113,12 @@ def handle_websocket(websocket):
                 if not isPause(session_message):
                     responses = agent.handle_message(msgRasa)
                     for response in responses:
-                        dashlog.log(response['recipient_id'], intent_name="", queryText=response)
+                        log_message = ""
+                        if 'text' in response.keys():
+                            log_message = response['text']
+                        else:
+                            log_message = json.dumps(response['attachment'], indent=3)
+                        dashlog.log(response['recipient_id'], intent_name="", queryText=log_message)
                         time.sleep(1)
                         websocket.send(json.dumps(send_typing()))
                         time.sleep(1.5)
