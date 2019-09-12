@@ -20,8 +20,7 @@ class Tracker(object):
         else:
             msg_log.set_as_type_user()
         
-        res = msg_log.send()
-        print(res.text)
+        msg_log.send()
 
     def view_tracker(self):
         print(json.dumps(self.tracker, indent=3))
