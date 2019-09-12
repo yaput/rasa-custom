@@ -60,7 +60,7 @@ def pause_bot():
 def liveperson():
     req_data = request.get_json()
     userID = req_data['userId']
-    dashlog.log("outgoing", None, userID,queryText=req_data['text'],intent_name='Human In The Loop')
+    dashlog.log(userID, intent_name='Human In The Loop', queryText=req_data['text'])
     if not isPause(userID):
         pause_user(userID)
     send_message(userID, req_data['text'])
@@ -113,14 +113,14 @@ def handle_websocket(websocket):
                 if not isPause(session_message):
                     responses = agent.handle_message(msgRasa)
                     for response in responses:
-                        dashlog.log("outgoing", response,response['recipient_id'])
+                        dashlog.log(response['recipient_id'], intent_name="", queryText=response)
                         time.sleep(1)
                         websocket.send(json.dumps(send_typing()))
                         time.sleep(1.5)
                         parsed_message = parse_bot_response(response)
                         websocket.send(json.dumps(parsed_message))
                 else:
-                    dashlog.log("incoming", None, session_message,queryText=text_message,intent_name='Human In The Loop')
+                    dashlog.log(session_message, intent_name="Human In The Loop", queryText=text_message, agent=False)
         except WebSocketError as ex:
             print(ex)
 
