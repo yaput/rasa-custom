@@ -354,7 +354,7 @@ from flask import Flask, Response, request
 config = load_config()
 response_template = None
 n = NLG(config)
-# dashlog = Tracker(config['dashbot']['api'],config['dashbot'][config["template"]["module"]]['api_key'])
+dashlog = Tracker(config['dashbot']['api'],config['dashbot'][config["template"]["module"]]['api_key'])
 with open('%s' % config["response"]["path"], encoding='utf8') as temp:
     response_template = json.load(temp)
 
@@ -375,7 +375,7 @@ def nlg():
         lang = slot['language']
     if lang == None or lang == "":
         lang = "en"
-    # dashlog.log(sender_id, intent_name=intent, queryText=text, agent=False)
+    dashlog.log(sender_id, intent_name=intent, queryText=text, agent=False)
     response = n.get_response(lang)
     return Response(json.dumps(response,indent=3), mimetype="application/json")
 
