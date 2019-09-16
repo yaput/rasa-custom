@@ -112,7 +112,9 @@ def handle_websocket(websocket, lang):
                     text_message = '/session_started{"language": "'+split_txt[3]+'"}'
 
                 msgRasa = UserMessage(sender_id=session_message,text=text_message)
-                t = agent.log_message(msgRasa)
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                t = loop.run_until_complete(agent.log_message(msgRasa))
                 slots = t.current_slot_values()
                 update_lang(session_message, slots['language'])
                 
@@ -120,8 +122,7 @@ def handle_websocket(websocket, lang):
                     pause_user(session_message, pause=False)
 
                 if not isPause(session_message):
-                    loop = asyncio.new_event_loop()
-                    asyncio.set_event_loop(loop)
+                    
                     responses = loop.run_until_complete(agent.handle_message(msgRasa))
                     for response in responses:
                         dashlog.log(response['recipient_id'], intent_name="", queryText=response)
