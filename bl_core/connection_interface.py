@@ -126,9 +126,8 @@ def handle_websocket(websocket, lang):
                     responses = loop.run_until_complete(agent.handle_message(msgRasa))
                     for response in responses:
                         dashlog.log("outgoing", response,response['recipient_id'])
-                        time.sleep(1)
                         websocket.send(json.dumps(send_typing()))
-                        time.sleep(1.5)
+                        time.sleep(1)
                         parsed_message = parse_bot_response(response)
                         websocket.send(json.dumps(parsed_message))
                 else:
