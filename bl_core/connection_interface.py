@@ -127,7 +127,7 @@ def handle_websocket(websocket, lang):
                     for response in responses:
                         dashlog.log("outgoing", response,response['recipient_id'])
                         websocket.send(json.dumps(send_typing()))
-                        time.sleep(1)
+                        time.sleep(0.5)
                         parsed_message = parse_bot_response(response)
                         websocket.send(json.dumps(parsed_message))
                 else:
