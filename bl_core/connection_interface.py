@@ -36,7 +36,7 @@ nlu_interpreter_ar = RasaNLUInterpreter('./models/nlu/ar/')
 nlu_interpreter_er = RasaNLUInterpreter('./models/nlu/er')
 action_endpoint = EndpointConfig(url=config['server']['actions_endpoint'])
 nlg_endpoint = EndpointConfig(url=config['server']['nlg_endpoint'])
-domain = Domain.load('./data/'+config['template']['module']+'/domain.yml')
+domain = Domain.load('domain.yml')
 db_conf = config['bluelog']
 mongo_tracker = MongoTrackerStore(domain, host=db_conf['host'], db=db_conf['db'], username=db_conf['username'], password=db_conf['password'], auth_source=db_conf['authsource'], collection=config['template']['module'])
 
@@ -50,7 +50,8 @@ agent_idn = Agent.load('./models/core/core.tar.gz',
                        action_endpoint=action_endpoint,
                        generator=nlg_endpoint,
                        tracker_store=mongo_tracker)
-agent_ar = Agent.load('./models/core/core.tar.gz',
+agent_ar = Agent.load('./models/core/core.tar.'
+                      'gz',
                       interpreter=nlu_interpreter_ar,
                       action_endpoint=action_endpoint,
                       generator=nlg_endpoint,
@@ -104,6 +105,21 @@ def wsgi_app(environ, start_response):
             print(e)
             print("Stop Connection")
         return []
+    elif path== '/ws/ar':
+        try:
+            handle_websocket(environ["wsgi.websocket"], "ar")
+        except Exception as e:
+            print(e)
+            print("Stop Connection")
+        return []
+    elif path == '/ws/er':
+        try:
+            handle_websocket(environ["wsgi.websocket"], "er")
+        except Exception as e:
+            print(e)
+            print("Stop Connection")
+        return []
+
     else:  
         return app(environ, start_response)
 
