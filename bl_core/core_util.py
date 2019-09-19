@@ -294,9 +294,20 @@ def send_tenancy_form(session_id, data):
         "data": form_data['data']
     }
 
+def send_download_transcript(session_id, data):
+    file_url = data[0]
+    return {
+        "is_received": True,
+        "type": "download_chattranscript",
+        "text": "download",
+        "channel": "socket",
+        "data":[{"filename": file_url}]
+    }
+
 def parse_bot_response(response):
     session_id = response['recipient_id']
     map_attachment_response = {
+        'download_chattranscript': send_download_transcript,
         'carousel': send_carousel,
         'quickreplies': send_quickreplies,
         'existing_user_form': send_existing_user_form,
