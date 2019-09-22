@@ -301,7 +301,7 @@ def send_download_transcript(session_id, data):
         "type": "download_chattranscript",
         "text": "download",
         "channel": "socket",
-        "data":[{"filename": file_url}]
+        "data":{"filename": file_url}
     }
 
 def parse_bot_response(response):
