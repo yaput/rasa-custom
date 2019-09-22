@@ -355,7 +355,7 @@ config = load_config()
 response_template = None
 n = NLG(config)
 dashlog = Tracker(config['dashbot']['api'],config['dashbot'][config["template"]["module"]]['api_key'])
-with open('%s' % config["response"]["path"]) as temp:
+with open('%s' % config["response"]["path"], encoding='utf8') as temp:
     response_template = json.load(temp)
 
 app = Flask(__name__)
