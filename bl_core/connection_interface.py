@@ -37,15 +37,19 @@ host,port='0.0.0.0',config['websocket']['port']
 dashlog = Tracker(config['dashbot']['api'],config['dashbot'][config["template"]["module"]]['api_key'])
 
 
-
-nlu_interpreter = RasaNLUInterpreter('./models/nlu/latest/')
+nlu_interpreter_en = RasaNLUInterpreter('./models/nlu/en/')
+nlu_interpreter_ar = RasaNLUInterpreter('./models/nlu/ar/')
 action_endpoint = EndpointConfig(url=config['server']['actions_endpoint'])
 nlg_endpoint = EndpointConfig(url=config['server']['nlg_endpoint'])
 domain = Domain.load('./data/'+config['template']['module']+'/domain.yml')
 db_conf = config['bluelog']
 mongo_tracker = MongoTrackerStore(domain, host=db_conf['host'], db=db_conf['db'], username=db_conf['username'], password=db_conf['password'], auth_source=db_conf['authsource'], collection=config['template']['module'])
 
-agent = Agent.load('./models/dialogue', interpreter=nlu_interpreter, action_endpoint=action_endpoint,generator=nlg_endpoint, tracker_store=mongo_tracker)
+# agent = Agent.load('./models/dialogue', interpreter=nlu_interpreter, action_endpoint=action_endpoint,generator=nlg_endpoint, tracker_store=mongo_tracker)
+agent_en = Agent.load('./models/core/core.tar.gz', interpreter=nlu_interpreter_en, action_endpoint=action_endpoint,
+                      generator=nlg_endpoint, tracker_store=mongo_tracker)
+agent_ar = Agent.load('./models/core/core.tar.gz', interpreter=nlu_interpreter_ar, action_endpoint=action_endpoint,
+                       generator=nlg_endpoint, tracker_store=mongo_tracker)
 
 
 @app.route("/pause", methods=['POST'])
@@ -67,18 +71,35 @@ def liveperson():
     send_message(userID, req_data['text'])
     return Response("OK")
 
+
 def wsgi_app(environ, start_response):  
     path = environ["PATH_INFO"]  
-    if path == "/ws":
-        try:  
-            handle_websocket(environ["wsgi.websocket"])
+    if path == "/ws/ar":
+        lang = "ar"
+        try:
+            handle_websocket(environ["wsgi.websocket"], lang)
         except Exception as e:
             print(e)
             print("Stop Connection")
         return []
-    else:  
-        return app(environ, start_response)  
-def handle_websocket(websocket):
+    if path == "/ws/en":
+        lang = "en"
+        try:
+            handle_websocket(environ["wsgi.websocket"], lang)
+        except Exception as e:
+            print(e)
+            print("Stop Connection")
+        return []
+    else:
+        return app(environ, start_response)
+
+
+def handle_websocket(websocket, lang):
+    if lang == "ar":
+        agent = agent_en
+    else:
+        agent = agent_ar
+    agent = agent
     session_message = None
     if websocket != None:
         try:
