@@ -37,11 +37,11 @@ host,port='0.0.0.0',config['websocket']['port']
 dashlog = Tracker(config['dashbot']['api'],config['dashbot'][config["template"]["module"]]['api_key'])
 
 
-nlu_interpreter_en = RasaNLUInterpreter('./models/nlu/en/')
-nlu_interpreter_ar = RasaNLUInterpreter('./models/nlu/ar/')
+nlu_interpreter_en = RasaNLUInterpreter('./models/nlu/en/latest/')
+nlu_interpreter_ar = RasaNLUInterpreter('./models/nlu/ar/latest/')
 action_endpoint = EndpointConfig(url=config['server']['actions_endpoint'])
 nlg_endpoint = EndpointConfig(url=config['server']['nlg_endpoint'])
-domain = Domain.load('./data/'+config['template']['module']+'/domain.yml')
+domain = Domain.load('domain.yml')
 db_conf = config['bluelog']
 mongo_tracker = MongoTrackerStore(domain, host=db_conf['host'], db=db_conf['db'], username=db_conf['username'], password=db_conf['password'], auth_source=db_conf['authsource'], collection=config['template']['module'])
 
@@ -49,7 +49,7 @@ mongo_tracker = MongoTrackerStore(domain, host=db_conf['host'], db=db_conf['db']
 agent_en = Agent.load('./models/core/core.tar.gz', interpreter=nlu_interpreter_en, action_endpoint=action_endpoint,
                       generator=nlg_endpoint, tracker_store=mongo_tracker)
 agent_ar = Agent.load('./models/core/core.tar.gz', interpreter=nlu_interpreter_ar, action_endpoint=action_endpoint,
-                       generator=nlg_endpoint, tracker_store=mongo_tracker)
+                    generator=nlg_endpoint, tracker_store=mongo_tracker)
 
 
 @app.route("/pause", methods=['POST'])

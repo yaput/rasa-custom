@@ -26,6 +26,9 @@ class NLG():
     
     def get_intent(self):
         intent = self.request_data['tracker']['latest_message']['intent']
+        message = self.request_data['tracker']['latest_message']
+        print("*******debug********")
+        print(intent, intent['confidence'], message)
         if intent['confidence'] <= self.config['nlu']['threshold']:
             return "default_fallback"
         return self.request_data['tracker']['latest_message']['intent']['name']

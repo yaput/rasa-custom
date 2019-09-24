@@ -1,5 +1,6 @@
 import json, time
 from .config import load_config
+from . import core_util
 config = load_config()
 template_message = None
 with open('./data/%s/database/master/response.json' % config["template"]["module"]) as temp:
