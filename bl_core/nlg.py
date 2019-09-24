@@ -380,6 +380,7 @@ def nlg():
         lang = "en"
     dashlog.log("incoming", None, sender_id,queryText=text,intent_name=intent)
     response = n.get_response(lang)
+    print("response, ", response)
     return Response(json.dumps(response,indent=3), mimetype="application/json")
 
 

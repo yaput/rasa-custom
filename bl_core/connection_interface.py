@@ -26,30 +26,29 @@ from .core_util import parse_bot_response, send_typing
 
 from .tracker import Tracker
 from .user_map import (isPause, pause_user, pop_user, send_message, store_user,
-                      user_map, UserTracker, update_lang)
+                       user_map, UserTracker, update_lang)
 
 app = Flask(__name__)
 app.debug = True
 
-
 config = load_config()
-host,port='0.0.0.0',config['websocket']['port']
-dashlog = Tracker(config['dashbot']['api'],config['dashbot'][config["template"]["module"]]['api_key'])
+host, port = '0.0.0.0', config['websocket']['port']
+dashlog = Tracker(config['dashbot']['api'], config['dashbot'][config["template"]["module"]]['api_key'])
 
-
-nlu_interpreter_en = RasaNLUInterpreter('./models/nlu/en/latest/')
-nlu_interpreter_ar = RasaNLUInterpreter('./models/nlu/ar/latest/')
+nlu_interpreter_ar = RasaNLUInterpreter('./models/nlu/ar/latest')
+nlu_interpreter_en = RasaNLUInterpreter('./models/nlu/en/latest')
 action_endpoint = EndpointConfig(url=config['server']['actions_endpoint'])
 nlg_endpoint = EndpointConfig(url=config['server']['nlg_endpoint'])
 domain = Domain.load('domain.yml')
 db_conf = config['bluelog']
-mongo_tracker = MongoTrackerStore(domain, host=db_conf['host'], db=db_conf['db'], username=db_conf['username'], password=db_conf['password'], auth_source=db_conf['authsource'], collection=config['template']['module'])
+mongo_tracker = MongoTrackerStore(domain, host=db_conf['host'], db=db_conf['db'], username=db_conf['username'],
+                                  password=db_conf['password'], auth_source=db_conf['authsource'],
+                                  collection=config['template']['module'])
 
-# agent = Agent.load('./models/dialogue', interpreter=nlu_interpreter, action_endpoint=action_endpoint,generator=nlg_endpoint, tracker_store=mongo_tracker)
 agent_en = Agent.load('./models/core/core.tar.gz', interpreter=nlu_interpreter_en, action_endpoint=action_endpoint,
                       generator=nlg_endpoint, tracker_store=mongo_tracker)
 agent_ar = Agent.load('./models/core/core.tar.gz', interpreter=nlu_interpreter_ar, action_endpoint=action_endpoint,
-                    generator=nlg_endpoint, tracker_store=mongo_tracker)
+                       generator=nlg_endpoint, tracker_store=mongo_tracker)
 
 
 @app.route("/pause", methods=['POST'])
@@ -61,31 +60,30 @@ def pause_bot():
     print(user_map)
     return Response("OK")
 
+
 @app.route("/liveperson", methods=["POST"])
 def liveperson():
     req_data = request.get_json()
     userID = req_data['userId']
-    dashlog.log("outgoing", None, userID,queryText=req_data['text'],intent_name='Human In The Loop')
+    dashlog.log("outgoing", None, userID, queryText=req_data['text'], intent_name='Human In The Loop')
     if not isPause(userID):
         pause_user(userID)
     send_message(userID, req_data['text'])
     return Response("OK")
 
 
-def wsgi_app(environ, start_response):  
-    path = environ["PATH_INFO"]  
-    if path == "/ws/ar":
-        lang = "ar"
+def wsgi_app(environ, start_response):
+    path = environ["PATH_INFO"]
+    if path == "/ws/en":
         try:
-            handle_websocket(environ["wsgi.websocket"], lang)
+            handle_websocket(environ["wsgi.websocket"], "en")
         except Exception as e:
             print(e)
             print("Stop Connection")
         return []
-    if path == "/ws/en":
-        lang = "en"
+    elif path == '/ws/ar':
         try:
-            handle_websocket(environ["wsgi.websocket"], lang)
+            handle_websocket(environ["wsgi.websocket"], "ar")
         except Exception as e:
             print(e)
             print("Stop Connection")
@@ -95,11 +93,9 @@ def wsgi_app(environ, start_response):
 
 
 def handle_websocket(websocket, lang):
+    agent = agent_en
     if lang == "ar":
-        agent = agent_en
-    else:
         agent = agent_ar
-    agent = agent
     session_message = None
     if websocket != None:
         try:
@@ -113,18 +109,20 @@ def handle_websocket(websocket, lang):
                 store_user(session_message, websocket)
                 text_message = message['text']
                 if '[' in text_message and ']' in text_message:
-                    text_message = '/submit_symptom{"symptom": "'+text_message.replace('[','').replace(']', '').replace('"', "")+'"}'
+                    text_message = '/submit_symptom{"symptom": "' + text_message.replace('[', '').replace(']',
+                                                                                                          '').replace(
+                        '"', "") + '"}'
 
-                welcome = re.search("_hi_(.*)_((e|E)ng(.*)|(a|A)rab(.*))",text_message)
+                welcome = re.search("_hi_(.*)_((e|E)ng(.*)|(a|A)rab(.*))", text_message)
                 if welcome:
                     split_txt = text_message.split("_")
-                    text_message = '/session_started{"language": "'+split_txt[3]+'"}'
+                    text_message = '/session_started{"language": "' + split_txt[3] + '"}'
 
-                msgRasa = UserMessage(sender_id=session_message,text=text_message)
+                msgRasa = UserMessage(sender_id=session_message, text=text_message)
                 # # t = await agent.log_message(msgRasa)
                 # # slots = t.current_slot_values()
                 # update_lang(session_message, slots['language'])
-                
+
                 if text_message == "/restart" or text_message == "restart":
                     pause_user(session_message, pause=False)
 
@@ -133,22 +131,22 @@ def handle_websocket(websocket, lang):
                     asyncio.set_event_loop(loop)
                     responses = loop.run_until_complete(agent.handle_message(msgRasa))
                     for response in responses:
-                        delay = config['delay_time']
-                        if response['attachment']['type'] != "sound_text" and delay > 4:
-                            delay = 2.5
-                        dashlog.log("outgoing", response,response['recipient_id'])
+                        dashlog.log("outgoing", response, response['recipient_id'])
+                        time.sleep(1)
                         websocket.send(json.dumps(send_typing()))
-                        time.sleep(delay)
+                        time.sleep(1.5)
                         parsed_message = parse_bot_response(response)
                         websocket.send(json.dumps(parsed_message))
                 else:
-                    dashlog.log("incoming", None, session_message,queryText=text_message,intent_name='Human In The Loop')
+                    dashlog.log("incoming", None, session_message, queryText=text_message,
+                                intent_name='Human In The Loop')
         except WebSocketError as ex:
             print(ex)
+
 
 if __name__ == '__main__':
     userTrack = UserTracker()
     userTrack.start()
-    http_server = WSGIServer((host,port), wsgi_app, handler_class=WebSocketHandler)
-    print('Server started at %s:%s'%(host,port))
+    http_server = WSGIServer((host, port), wsgi_app, handler_class=WebSocketHandler)
+    print('Server started at %s:%s' % (host, port))
     http_server.serve_forever()
