@@ -375,7 +375,7 @@ def nlg():
         lang = slot['language']
     if lang == None or lang == "":
         lang = "en"
-    dashlog.log(sender_id, intent_name=intent, queryText=text, agent=False)
+    dashlog.log("incoming", None, sender_id,queryText=text,intent_name=intent)
     response = n.get_response(lang)
     return Response(json.dumps(response,indent=3), mimetype="application/json")
 
