@@ -2,6 +2,7 @@ import asyncio
 import json
 import re
 import time
+import os
 
 from flask import Flask, Response, request
 from gevent.pywsgi import WSGIServer
@@ -29,11 +30,26 @@ config = load_config()
 host,port='0.0.0.0',config['websocket']['port']
 dashlog = Tracker(config['dashbot']['api'],config['dashbot'][config["template"]["module"]]['api_key'])
 
+if os.path.isdir('./models/nlu'):
+    if os.path.isdir('./models/nlu/idn'):
+        nlu_interpreter_idn = RasaNLUInterpreter('./models/nlu/idn/')
+    else:
+        pass
+    if os.path.isdir('./models/nlu/en'):
+        nlu_interpreter_en = RasaNLUInterpreter('./models/nlu/en/')
+    else:
+        pass
+    if os.path.isdir('./models/nlu/ar'):
+        nlu_interpreter_ar = RasaNLUInterpreter('./models/nlu/ar/')
+    else:
+        pass
+    if os.path.isdir('./models/nlu/er'):
+        nlu_interpreter_er = RasaNLUInterpreter('./models/nlu/er')
+    else:
+        pass
+else:
+    print("Couldn't find path ./models/nlu")
 
-nlu_interpreter_idn = RasaNLUInterpreter('./models/nlu/idn/')
-nlu_interpreter_en = RasaNLUInterpreter('./models/nlu/en/')
-nlu_interpreter_ar = RasaNLUInterpreter('./models/nlu/ar/')
-nlu_interpreter_er = RasaNLUInterpreter('./models/nlu/er')
 action_endpoint = EndpointConfig(url=config['server']['actions_endpoint'])
 nlg_endpoint = EndpointConfig(url=config['server']['nlg_endpoint'])
 domain = Domain.load('domain.yml')
