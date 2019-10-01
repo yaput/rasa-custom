@@ -38,50 +38,53 @@ mongo_tracker = MongoTrackerStore(domain, host=db_conf['host'], db=db_conf['db']
 
 agent_all = {}
 
-if os.path.isdir('./models/nlu'):
-    if os.path.isdir('./models/nlu/idn'):
-        nlu_interpreter_idn = RasaNLUInterpreter('./models/nlu/idn/')
-        agent_idn = Agent.load('./models/core/core.tar.gz',
-                               interpreter=nlu_interpreter_idn,
-                               action_endpoint=action_endpoint,
-                               generator=nlg_endpoint,
-                               tracker_store=mongo_tracker)
-        agent_all["idn"] = agent_idn
+try:
+    if os.path.isdir('./models/nlu'):
+        if os.path.isdir('./models/nlu/idn'):
+            nlu_interpreter_idn = RasaNLUInterpreter('./models/nlu/idn/')
+            agent_idn = Agent.load('./models/core/core.tar.gz',
+                                   interpreter=nlu_interpreter_idn,
+                                   action_endpoint=action_endpoint,
+                                   generator=nlg_endpoint,
+                                   tracker_store=mongo_tracker)
+            agent_all["idn"] = agent_idn
+        else:
+            pass
+        if os.path.isdir('./models/nlu/en'):
+            nlu_interpreter_en = RasaNLUInterpreter('./models/nlu/en/')
+            agent_en = Agent.load('./models/core/core.tar.gz',
+                                  interpreter=nlu_interpreter_en,
+                                  action_endpoint=action_endpoint,
+                                  generator=nlg_endpoint,
+                                  tracker_store=mongo_tracker)
+            agent_all["en"] = agent_en
+        else:
+            pass
+        if os.path.isdir('./models/nlu/ar'):
+            nlu_interpreter_ar = RasaNLUInterpreter('./models/nlu/ar/')
+            agent_ar = Agent.load('./models/core/core.tar.'
+                                  'gz',
+                                  interpreter=nlu_interpreter_ar,
+                                  action_endpoint=action_endpoint,
+                                  generator=nlg_endpoint,
+                                  tracker_store=mongo_tracker)
+            agent_all["ar"] = agent_ar
+        else:
+            pass
+        if os.path.isdir('./models/nlu/er'):
+            nlu_interpreter_er = RasaNLUInterpreter('./models/nlu/er')
+            agent_er = Agent.load('./models/core/core.tar.gz',
+                                  interpreter=nlu_interpreter_er,
+                                  action_endpoint=action_endpoint,
+                                  generator=nlg_endpoint,
+                                  tracker_store=mongo_tracker)
+            agent_all["er"] = agent_er
+        else:
+            pass
     else:
-        pass
-    if os.path.isdir('./models/nlu/en'):
-        nlu_interpreter_en = RasaNLUInterpreter('./models/nlu/en/')
-        agent_en = Agent.load('./models/core/core.tar.gz',
-                              interpreter=nlu_interpreter_en,
-                              action_endpoint=action_endpoint,
-                              generator=nlg_endpoint,
-                              tracker_store=mongo_tracker)
-        agent_all["en"] = agent_en
-    else:
-        pass
-    if os.path.isdir('./models/nlu/ar'):
-        nlu_interpreter_ar = RasaNLUInterpreter('./models/nlu/ar/')
-        agent_ar = Agent.load('./models/core/core.tar.'
-                              'gz',
-                              interpreter=nlu_interpreter_ar,
-                              action_endpoint=action_endpoint,
-                              generator=nlg_endpoint,
-                              tracker_store=mongo_tracker)
-        agent_all["ar"] = agent_ar
-    else:
-        pass
-    if os.path.isdir('./models/nlu/er'):
-        nlu_interpreter_er = RasaNLUInterpreter('./models/nlu/er')
-        agent_er = Agent.load('./models/core/core.tar.gz',
-                              interpreter=nlu_interpreter_er,
-                              action_endpoint=action_endpoint,
-                              generator=nlg_endpoint,
-                              tracker_store=mongo_tracker)
-        agent_all["er"] = agent_er
-    else:
-        pass
-else:
-    print("Couldn't find path ./models/nlu")
+        raise Exception("Couldn't find path ./models/nlu")
+except Exception as e:
+    print('Message: '+repr(e))
 
 """agent_all = {"idn": agent_idn,
              "en": agent_en,
