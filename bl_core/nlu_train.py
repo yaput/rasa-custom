@@ -1,6 +1,6 @@
-from rasa_nlu.training_data import load_data
-from rasa_nlu.model import Trainer
-from rasa_nlu import config
+from rasa.nlu.training_data import load_data
+from rasa.nlu.model import Trainer
+from rasa.nlu import config
 
 def train_nlu(name, lang="en",production_build=False):
     model_name = "production"
