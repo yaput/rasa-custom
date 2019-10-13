@@ -8,12 +8,12 @@ from flask import Flask, Response, request
 from gevent.pywsgi import WSGIServer
 from geventwebsocket.handler import WebSocketHandler
 from geventwebsocket.websocket import WebSocketError
-from rasa_core.agent import Agent
-from rasa_core.channels import UserMessage
-from rasa_core.interpreter import RasaNLUInterpreter
-from rasa_core.utils import EndpointConfig
-from rasa_core.tracker_store import MongoTrackerStore
-from rasa_core.domain import Domain
+from rasa.core.agent import Agent
+from rasa.core.channels import UserMessage
+from rasa.core.interpreter import RasaNLUInterpreter
+from rasa.core.utils import EndpointConfig
+from rasa.core.tracker_store import MongoTrackerStore
+from rasa.core.domain import Domain
 
 from .config import load_config
 from .core_util import parse_bot_response, send_typing

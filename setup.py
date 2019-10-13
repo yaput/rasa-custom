@@ -10,7 +10,5 @@ setup(name='bl_core',
       install_requires=[
           'rasa==1.3.7',
           'rasa-sdk==1.3.3',
-          'rasa-nlu==0.15.1',
-          'rasa-core==0.14.4',
       ],
       zip_safe=False)
