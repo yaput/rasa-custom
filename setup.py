@@ -12,8 +12,5 @@ setup(name='bl_core',
           'rasa-sdk==1.3.3',
           'rasa-nlu==0.15.1',
           'rasa-core==0.14.4',
-          'flask',
-          'gevent-websocket',
-          'waitress'
       ],
       zip_safe=False)
