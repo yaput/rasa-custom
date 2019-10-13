@@ -11,7 +11,7 @@ from geventwebsocket.websocket import WebSocketError
 from rasa.core.agent import Agent
 from rasa.core.channels import UserMessage
 from rasa.core.interpreter import RasaNLUInterpreter
-from rasa.core.utils import EndpointConfig
+from rasa.utils.endpoints import EndpointConfig
 from rasa.core.tracker_store import MongoTrackerStore
 from rasa.core.domain import Domain
 
