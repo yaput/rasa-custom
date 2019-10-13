@@ -11,7 +11,7 @@ def request_query(query='', session_id=''):
 
 def send_quickreplies(session_id, quickreplies):
     return {
-        "text": quickreplies[0]['text'],
+        "text": quickreplies[0].get('text',""),
         "quick_replies": quickreplies[0]['replies'],
         "channel":"socket",
         "user": session_id,
@@ -141,17 +141,11 @@ def send_account_form(session_id, message=None):
         "channel": "socket"
     }
 
-def send_sound(session_id, message=None):
-    return {
-        "type": "new_component",
-        "channel": "socket"
-    }
-
 def send_typing():
     return {"type":"typing"}
 
 def send_search_bar(session_id, data):
-    if isinstance(data,list):
+    if isinstance(data, list):
         data = data[0]
     items = []
     for d in data['data']:
@@ -175,6 +169,31 @@ def send_dynamic_form(session_id, data):
         "data": {
             "fields": data
         }
+    }
+
+
+def send_qr_code(session_id, data):
+    d = data[0]
+    return {
+        "is_received": True,
+        "type": "qrcode",
+        "service_name": d["service_name"],
+        "start_date": d["start_date"],
+        "customer_count": d["customer_in_queue"],
+        "approx_time": d["approx_time"],
+        "value": d["customer_token"],
+        "channel": "socket"
+    }
+
+
+def send_sound(session_id, data):
+    d = data[0]
+    return {
+        "is_received": True,
+        "type": "sound_tract",
+        "text": d['text'],
+        "channel": "socket",
+        "link": d['sound']
     }
 
 def send_get_user_location(session_id, data):
@@ -270,6 +289,29 @@ def send_new_link(session_id, data):
            }]
       }
 
+def send_download(session_id, data):
+    file_send = data[0]
+    return {
+        "is_received": True,
+        "type": "download",
+        "text": "download",
+        "channel": "socket",
+        "data":[{"filename": file_send}]
+    }
+
+def send_tenancy_form(session_id, data):
+    form_data = data[0]
+    return {
+        "type": "tenancy_form",
+         "channel": "socket",
+         "content": {
+            "text": form_data['text'],
+            "type": "tenancy_form",
+            "input_disable": "true",
+            "data": form_data['data']
+         }
+    }
+
 def parse_bot_response(response):
     session_id = response['recipient_id']
     map_attachment_response = {
@@ -301,7 +343,10 @@ def parse_bot_response(response):
         'end_session': send_end_session,
         "newlink": send_new_link,
         'send_nothing': send_nothing,
-        "send_sound": send_sound,
+        "sound_text": send_sound,
+        "download": send_download,
+        "tenancy_form": send_tenancy_form,
+        "qrcode": send_qr_code,
     }
     if 'text' in response.keys():
         return send_text(session_id, response['text'])
@@ -331,7 +376,7 @@ def sendMail(to, message_text, subject, cc =[], filename=""):
     message_text = message_text
     msg.attach(MIMEText(message_text, 'plain'))
     if filename != "":
-        with open(filename, 'r') as f:
+        with open(filename, encoding='utf8') as f:
             attachment = MIMEText(f.read())
             attachment.add_header('Content-Disposition', 'attachment', filename=filename)           
             msg.attach(attachment)

@@ -1,14 +1,9 @@
 import asyncio
-import datetime
 import json
 import re
-import signal
-import sys
 import time
-from pprint import pprint
+import os
 
-import requests
-import websockets
 from flask import Flask, Response, request
 from gevent.pywsgi import WSGIServer
 from geventwebsocket.handler import WebSocketHandler
@@ -24,8 +19,8 @@ from .config import load_config
 from .core_util import parse_bot_response, send_typing
 
 from .tracker import Tracker
-from .user_map import (isPause, pause_user, pop_user, send_message, store_user,
-                      user_map, UserTracker, update_lang)
+from .user_map import (isPause, pause_user, send_message, store_user,
+                      user_map, UserTracker)
 
 app = Flask(__name__)
 app.debug = True
@@ -35,16 +30,66 @@ config = load_config()
 host,port='0.0.0.0',config['websocket']['port']
 dashlog = Tracker(config['dashbot'][config["template"]["module"]]['api_key'], 'web')
 
-
-
-nlu_interpreter = RasaNLUInterpreter('./models/'+config['template']['module']+'/nlu/global/latest')
 action_endpoint = EndpointConfig(url=config['server']['actions_endpoint'])
 nlg_endpoint = EndpointConfig(url=config['server']['nlg_endpoint'])
-domain = Domain.load('./data/'+config['template']['module']+'/domain.yml')
+domain = Domain.load('domain.yml')
 db_conf = config['bluelog']
 mongo_tracker = MongoTrackerStore(domain, host=db_conf['host'], db=db_conf['db'], username=db_conf['username'], password=db_conf['password'], auth_source=db_conf['authsource'], collection=config['template']['module'])
 
-agent = Agent.load('./models/'+config['template']['module']+'/dialogue', interpreter=nlu_interpreter, action_endpoint=action_endpoint,generator=nlg_endpoint, tracker_store=mongo_tracker)
+agent_all = {}
+
+try:
+    if os.path.isdir('./models/nlu'):
+        if os.path.isdir('./models/nlu/idn'):
+            nlu_interpreter_idn = RasaNLUInterpreter('./models/nlu/idn/')
+            agent_idn = Agent.load('./models/core/core.tar.gz',
+                                   interpreter=nlu_interpreter_idn,
+                                   action_endpoint=action_endpoint,
+                                   generator=nlg_endpoint,
+                                   tracker_store=mongo_tracker)
+            agent_all["idn"] = agent_idn
+        else:
+            pass
+        if os.path.isdir('./models/nlu/en'):
+            nlu_interpreter_en = RasaNLUInterpreter('./models/nlu/en/')
+            agent_en = Agent.load('./models/core/core.tar.gz',
+                                  interpreter=nlu_interpreter_en,
+                                  action_endpoint=action_endpoint,
+                                  generator=nlg_endpoint,
+                                  tracker_store=mongo_tracker)
+            agent_all["en"] = agent_en
+        else:
+            pass
+        if os.path.isdir('./models/nlu/ar'):
+            nlu_interpreter_ar = RasaNLUInterpreter('./models/nlu/ar/')
+            agent_ar = Agent.load('./models/core/core.tar.'
+                                  'gz',
+                                  interpreter=nlu_interpreter_ar,
+                                  action_endpoint=action_endpoint,
+                                  generator=nlg_endpoint,
+                                  tracker_store=mongo_tracker)
+            agent_all["ar"] = agent_ar
+        else:
+            pass
+        if os.path.isdir('./models/nlu/er'):
+            nlu_interpreter_er = RasaNLUInterpreter('./models/nlu/er')
+            agent_er = Agent.load('./models/core/core.tar.gz',
+                                  interpreter=nlu_interpreter_er,
+                                  action_endpoint=action_endpoint,
+                                  generator=nlg_endpoint,
+                                  tracker_store=mongo_tracker)
+            agent_all["er"] = agent_er
+        else:
+            pass
+    else:
+        raise Exception("Couldn't find path ./models/nlu")
+except Exception as e:
+    print('Message: '+repr(e))
+
+"""agent_all = {"idn": agent_idn,
+             "en": agent_en,
+             "ar": agent_ar,
+             "er": agent_er}"""
 
 
 @app.route("/pause", methods=['POST'])
@@ -56,6 +101,7 @@ def pause_bot():
     print(user_map)
     return Response("OK")
 
+
 @app.route("/liveperson", methods=["POST"])
 def liveperson():
     req_data = request.get_json()
@@ -66,22 +112,52 @@ def liveperson():
     send_message(userID, req_data['text'])
     return Response("OK")
 
-@app.route("/check", methods=['GET'])
-def check():
-    return Response("Aster UAE")
 
 def wsgi_app(environ, start_response):  
     path = environ["PATH_INFO"]  
-    if path == "/ws":
+    if path == "/ws/en":
         try:  
-            handle_websocket(environ["wsgi.websocket"])
+            handle_websocket(environ["wsgi.websocket"], "en")
         except Exception as e:
             print(e)
             print("Stop Connection")
         return []
+    elif path == '/ws/idn':
+        try:  
+            handle_websocket(environ["wsgi.websocket"], "idn")
+        except Exception as e:
+            print(e)
+            print("Stop Connection")
+        return []
+    elif path== '/ws/ar':
+        try:
+            handle_websocket(environ["wsgi.websocket"], "ar")
+        except Exception as e:
+            print(e)
+            print("Stop Connection")
+        return []
+    elif path == '/ws/er':
+        try:
+            handle_websocket(environ["wsgi.websocket"], "er")
+        except Exception as e:
+            print(e)
+            print("Stop Connection")
+        return []
+
     else:  
-        return app(environ, start_response)  
-def handle_websocket(websocket):
+        return app(environ, start_response)
+
+
+def handle_websocket(websocket, lang):
+    agent = agent_all
+    if lang == "idn":
+        agent = agent_all['idn']
+    elif lang == "en":
+        agent = agent_all['en']
+    elif lang == "ar":
+        agent = agent_all['ar']
+    elif lang == "er":
+        agent = agent_all['er']
     session_message = None
     if websocket != None:
         try:
@@ -103,15 +179,13 @@ def handle_websocket(websocket):
                     text_message = '/session_started{"language": "'+split_txt[3]+'"}'
 
                 msgRasa = UserMessage(sender_id=session_message,text=text_message)
-                t = agent.log_message(msgRasa)
-                slots = t.current_slot_values()
-                update_lang(session_message, slots['language'])
-                
                 if text_message == "/restart" or text_message == "restart":
                     pause_user(session_message, pause=False)
 
                 if not isPause(session_message):
-                    responses = agent.handle_message(msgRasa)
+                    loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(loop)
+                    responses = loop.run_until_complete(agent.handle_message(msgRasa))
                     for response in responses:
                         log_message = ""
                         if 'text' in response.keys():
@@ -128,6 +202,7 @@ def handle_websocket(websocket):
                     dashlog.log(session_message, intent_name="Human In The Loop", queryText=text_message, agent=False)
         except WebSocketError as ex:
             print(ex)
+
 
 if __name__ == '__main__':
     userTrack = UserTracker()

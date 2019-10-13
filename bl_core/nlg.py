@@ -11,7 +11,7 @@ class NLG():
         self.DEFAULT_ERROR_RESPONSE = 'utter_default_error'
 
         self.config = config
-        with open('%s' % config["response"]["path"]) as temp:
+        with open('%s' % config["response"]["path"], encoding='utf8') as temp:
             self.response_template = json.load(temp)
         self.request_data = None
         return
@@ -119,7 +119,7 @@ class NLG():
             else:
                 resp = requests.get(self._replace_template_with_value(url))
 
-            data = json.loads(resp.text)
+            data = json.loads(resp.text, format="utf-8")
             
             # temp_element = []
             postbacks = []
@@ -410,8 +410,8 @@ from flask import Flask, Response, request
 config = load_config()
 response_template = None
 n = NLG(config)
-dashlog = Tracker(config['dashbot'][config["template"]["module"]]['api_key'], 'web')
-with open('%s' % config["response"]["path"]) as temp:
+dashlog = Tracker(config['dashbot']['api'],config['dashbot'][config["template"]["module"]]['api_key'])
+with open('%s' % config["response"]["path"], encoding='utf8') as temp:
     response_template = json.load(temp)
 
 app = Flask(__name__)
@@ -438,13 +438,13 @@ def nlg():
 
 from waitress import serve
 import os, sys
-env = os.getenv("BLUELOGIC_ENV", "development")
+#env = os.getenv("BLUELOGIC_ENV", "development")
 port = 5006
 if sys.argv[1] == '-p':
     port = int(sys.argv[2])
 if __name__ == "__main__":
-    if env == "production":
+    """if env == "production":
         serve(app, listen='*:%d' % port)
     else:
-        app.run(debug=True, port=port)
-
+        app.run(debug=True, port=port)"""
+    serve(app, listen='*:%d' % port)
