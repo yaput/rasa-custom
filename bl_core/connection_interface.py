@@ -28,7 +28,7 @@ app.debug = True
 
 config = load_config()
 host,port='0.0.0.0',config['websocket']['port']
-dashlog = Tracker(config['dashbot'][config["template"]["module"]]['api_key'], 'web')
+dashlog = Tracker(config['dashbot']['api'],config['dashbot'][config["template"]["module"]]['api_key'])
 
 action_endpoint = EndpointConfig(url=config['server']['actions_endpoint'])
 nlg_endpoint = EndpointConfig(url=config['server']['nlg_endpoint'])
