@@ -438,13 +438,13 @@ def nlg():
 
 from waitress import serve
 import os, sys
-#env = os.getenv("BLUELOGIC_ENV", "development")
+env = os.getenv("BLUELOGIC_ENV", "development")
 port = 5006
 if sys.argv[1] == '-p':
     port = int(sys.argv[2])
 if __name__ == "__main__":
-    """if env == "production":
+    if env == "production":
         serve(app, listen='*:%d' % port)
     else:
-        app.run(debug=True, port=port)"""
-    serve(app, listen='*:%d' % port)
+        app.run(debug=True, port=port)
+    # serve(app, listen='*:%d' % port)

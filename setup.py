@@ -10,5 +10,8 @@ setup(name='bl_core',
       install_requires=[
           'rasa==1.3.7',
           'rasa-sdk==1.3.3',
+          'chatbase',
+          'gevent-websocket',
+          'waitress'
       ],
       zip_safe=False)
