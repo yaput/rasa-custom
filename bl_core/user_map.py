@@ -3,7 +3,7 @@ from .config import load_config
 from .core_util import parse_bot_response
 config = load_config()
 template_message = None
-with open('./data/%s/database/master/response.json' % config["template"]["module"], encoding='utf8') as temp:
+with open('./data/%s/database/response.json' % config["template"]["module"], encoding='utf8') as temp:
     template_message = json.load(temp)
 
 user_map = {}
