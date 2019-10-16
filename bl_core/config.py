@@ -6,7 +6,7 @@ def load_config(file='./config/development.config.json'):
     {'test': 'ok'}
     """
     env = os.getenv("BLUELOGIC_ENV", "development")
-    file = 'config/%s.config.json' % env
+    file = './config/%s.config.json' % env
     with open(file, encoding='utf8') as cfg:
         logging.info("Config Loaded from: %s" % file)
         config = json.load(cfg)
