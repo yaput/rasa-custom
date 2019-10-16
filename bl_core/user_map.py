@@ -1,10 +1,17 @@
 import json, time
 from .config import load_config
-from .core_util import parse_bot_response
+
+from .message import MessageExecutor
+
 config = load_config()
 template_message = None
 with open('./data/%s/database/master/response.json' % config["template"]["module"], encoding='utf8') as temp:
     template_message = json.load(temp)
+
+# Init message sender executor
+message_exec = MessageExecutor()
+# Load all send methods classes
+message_exec.load()
 
 user_map = {}
 
@@ -99,7 +106,7 @@ class UserTracker(threading.Thread):
                 "attachment": template_message['utter_session_timeout'][user_map[t]['language']]['content']
             }
             try:
-                user_map[t]['conn'].send(json.dumps(parse_bot_response(response)))
+                user_map[t]['conn'].send(json.dumps(message_exec.parse(response)))
             except Exception as e:
                 print(e.args)
                 pass

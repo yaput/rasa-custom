@@ -16,7 +16,7 @@ from rasa.core.tracker_store import MongoTrackerStore
 from rasa.core.domain import Domain
 
 from .config import load_config
-from .core_util import parse_bot_response, send_typing
+from .message import MessageExecutor
 
 from .tracker import Tracker
 from .user_map import (isPause, pause_user, send_message, store_user,
@@ -25,6 +25,10 @@ from .user_map import (isPause, pause_user, send_message, store_user,
 app = Flask(__name__)
 app.debug = True
 
+# Init message sender executor
+message_exec = MessageExecutor()
+# Load all send methods classes
+message_exec.load()
 
 config = load_config()
 host,port='0.0.0.0',config['websocket']['port']
@@ -193,9 +197,9 @@ def handle_websocket(websocket, lang):
                             log_message = json.dumps(response['attachment'], indent=3)
                         dashlog.log("outgoing", response,response['recipient_id'])
                         time.sleep(1)
-                        websocket.send(json.dumps(send_typing()))
+                        websocket.send(json.dumps(message_exec.send_typing()))
                         time.sleep(1.5)
-                        parsed_message = parse_bot_response(response)
+                        parsed_message = message_exec.parse(response)
                         websocket.send(json.dumps(parsed_message))
                 else:
                     dashlog.log("incoming", None, session_message,queryText=text_message,intent_name='Human In The Loop')

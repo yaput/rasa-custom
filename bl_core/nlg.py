@@ -422,14 +422,14 @@ def nlg():
     n.parse_request(req_data)
     text = n.get_query()
     intent = n.get_intent()
-    if intent == None or intent == "":
+    if intent is None or intent == "":
         intent = "default_fallback"
     sender_id = n.get_sender()
     slot = n._get_slots()
     lang = "en"
     if 'language' in slot.keys():
         lang = slot['language']
-    if lang == None or lang == "":
+    if lang is None or lang == "":
         lang = "en"
     dashlog.log("incoming", None, sender_id,queryText=text,intent_name=intent)
     response = n.get_response(lang)
