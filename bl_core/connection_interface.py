@@ -20,7 +20,7 @@ from .core_util import parse_bot_response, send_typing
 
 from .tracker import Tracker
 from .user_map import (isPause, pause_user, send_message, store_user,
-                      user_map, UserTracker)
+                      user_map, UserTracker, update_lang)
 
 app = Flask(__name__)
 app.debug = True
@@ -106,7 +106,7 @@ def pause_bot():
 def liveperson():
     req_data = request.get_json()
     userID = req_data['userId']
-    dashlog.log(userID, intent_name='Human In The Loop', queryText=req_data['text'])
+    dashlog.log("outgoing", None, userID,queryText=req_data['text'],intent_name='Human In The Loop')
     if not isPause(userID):
         pause_user(userID)
     send_message(userID, req_data['text'])
@@ -170,21 +170,20 @@ def handle_websocket(websocket, lang):
                 session_message = message['user']
                 store_user(session_message, websocket)
                 text_message = message['text']
-                if '[' in text_message and ']' in text_message:
-                    text_message = '/submit_symptom{"symptom": "'+text_message.replace('[','').replace(']', '').replace('"', "")+'"}'
-
-                welcome = re.search("_hi_(.*)_((e|E)ng(.*)|(a|A)rab(.*))",text_message)
-                if welcome:
-                    split_txt = text_message.split("_")
-                    text_message = '/session_started{"language": "'+split_txt[3]+'"}'
-
+                
                 msgRasa = UserMessage(sender_id=session_message,text=text_message)
                 if text_message == "/restart" or text_message == "restart":
                     pause_user(session_message, pause=False)
 
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                t = loop.run_until_complete(agent.log_message(msgRasa))
+                slots = t.current_slot_values()
+                update_lang(session_message, slots['language'])
+
                 if not isPause(session_message):
-                    loop = asyncio.new_event_loop()
-                    asyncio.set_event_loop(loop)
+                    # loop = asyncio.new_event_loop()
+                    # asyncio.set_event_loop(loop)
                     responses = loop.run_until_complete(agent.handle_message(msgRasa))
                     for response in responses:
                         log_message = ""
@@ -192,14 +191,14 @@ def handle_websocket(websocket, lang):
                             log_message = response['text']
                         else:
                             log_message = json.dumps(response['attachment'], indent=3)
-                        dashlog.log(response['recipient_id'], intent_name="", queryText=log_message)
+                        dashlog.log("outgoing", response,response['recipient_id'])
                         time.sleep(1)
                         websocket.send(json.dumps(send_typing()))
                         time.sleep(1.5)
                         parsed_message = parse_bot_response(response)
                         websocket.send(json.dumps(parsed_message))
                 else:
-                    dashlog.log(session_message, intent_name="Human In The Loop", queryText=text_message, agent=False)
+                    dashlog.log("incoming", None, session_message,queryText=text_message,intent_name='Human In The Loop')
         except WebSocketError as ex:
             print(ex)
 
