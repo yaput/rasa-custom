@@ -36,12 +36,15 @@ class Tracker(object):
             self.tracker["platformJson"] = payload
     
     def _send_log(self, tracker, msg_type):
-        full_url = self._url % (msg_type,self._api_key)
-        resp = requests.post(full_url, json=tracker)
-        if resp.status_code == 200:
-            logging.debug("REQUEST SUCCESS TO LOG DASHBOT")
-        else:
-            logging.debug("REQUEST FAILED TO LOG DASHBOT")
+        try:
+            full_url = self._url % (msg_type,self._api_key)
+            resp = requests.post(full_url, json=tracker)
+            if resp.status_code == 200:
+                logging.debug("REQUEST SUCCESS TO LOG DASHBOT")
+            else:
+                logging.debug("REQUEST FAILED TO LOG DASHBOT")
+        except Exception as e:
+            print(e.args)
 
     def log(self,msg_type, response, userID, intent_name=None, queryText=""):
         self._add_intent(intent_name, None)
