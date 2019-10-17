@@ -1,6 +1,6 @@
 import inspect
-import core_util
-from core.message import BluebotMessage
+import bl_core.core_util as core_util
+from .core.message import BluebotMessage
 
 class MessageExecutor():
     def __init__(self):
@@ -29,7 +29,11 @@ class MessageExecutor():
             except:
                 pass
 
-        return self.methods[method_type].send(session_id, data)
+        
+        try:
+            return self.methods[method_type].send(session_id, data)
+        except:
+            return self.methods['message'].send(session_id, data) 
 
     def send_typing(self):
         return {"type":"typing"}

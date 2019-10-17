@@ -1,5 +1,5 @@
 import json, requests, random
-from core.message import BluebotMessage
+from .core.message import BluebotMessage
 
 class QuickReplies(BluebotMessage):
     """
