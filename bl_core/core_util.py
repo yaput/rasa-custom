@@ -77,7 +77,7 @@ class Image(BluebotMessage):
     def type_name(self):
         return "image"
 
-    def send(session_id, image_data):
+    def send(self, session_id, image_data):
         return {
             "text": "image",
             "type": "image",
@@ -95,7 +95,7 @@ class Text(BluebotMessage):
     def type_name(self):
         return "text"
 
-    def send(session_id, message):
+    def send(self, session_id, message):
         if isinstance(message, list):
             message = message[random.randint(0, len(message) - 1)]
         return {
@@ -113,7 +113,7 @@ class ExistingUserForm(BluebotMessage):
     def type_name(self):
         return "existing_user_form"
 
-    def send(session_id, message=None):
+    def send(self, session_id, message=None):
         return {
             "type": "existing_user_form",
             "channel": "socket",
@@ -128,7 +128,7 @@ class DrivingLicenseForm(BluebotMessage):
     def type_name(self):
         return "driving_license_form"
 
-    def send(session_id, message=None):
+    def send(self, session_id, message=None):
         return {
             "type": "identity_verify_selection",
             "channel": "socket"
@@ -143,7 +143,7 @@ class VehicleDetailForm(BluebotMessage):
     def type_name(self):
         return "vehicle_detail_form"
 
-    def send(session_id, message=None):
+    def send(self, session_id, message=None):
         return {
             "type": "car_verify_selection",
             "channel": "socket"
@@ -157,7 +157,7 @@ class PaymentForm(BluebotMessage):
     def type_name(self):
         return "payment_form"
 
-    def send(sessison_id, message):
+    def send(self, sessison_id, message):
         return {
             "type": "payment_request",
             "channel": "socket"
@@ -171,7 +171,7 @@ class FinalQoute(BluebotMessage):
     def type_name(self):
         return "final_qoute"
 
-    def send(session_id, message=None):
+    def send(self, session_id, message=None):
         return {
             "type": "comprehensive",
             "channel": "socket"
@@ -185,7 +185,7 @@ class CompareQoute(BluebotMessage):
     def type_name(self):
         return "compare_qoute"
 
-    def send(session_id, message=None):
+    def send(self, session_id, message=None):
         return {
             "type": "quote_request",
             "channel": "socket"
@@ -199,7 +199,7 @@ class EmailSendPopup(BluebotMessage):
     def type_name(self):
         return "email_send_popup"
 
-    def send(session_id, message=None):
+    def send(self, session_id, message=None):
         return {
             "type": "confimation_popup",
             "channel": "socket"
@@ -213,7 +213,7 @@ class InvoiceDetails(BluebotMessage):
     def type_name(self):
         return "invoice_details"
 
-    def send(session_id, message=None):
+    def send(self, session_id, message=None):
         return {
             "type": "invoice_display",
             "channel": "socket"
@@ -227,7 +227,7 @@ class EmailSendForm(BluebotMessage):
     def type_name(self):
         return "email_send_form"
 
-    def send(session_id, message=None):
+    def send(self, session_id, message=None):
         return {
             "type": "collect_email",
             "channel": "socket"
@@ -241,7 +241,7 @@ class CreateAccountForm(BluebotMessage):
     def type_name(self):
         return "create_account_form"
 
-    def send(session_id, message=None):
+    def send(self, session_id, message=None):
         return {
             "type": "register_account",
             "channel": "socket"
@@ -255,7 +255,7 @@ class SearchBar(BluebotMessage):
     def type_name(self):
         return "search_bar"
 
-    def send(session_id, data):
+    def send(self, session_id, data):
         if isinstance(data, list):
             data = data[0]
         items = []
@@ -280,7 +280,7 @@ class Form(BluebotMessage):
     def type_name(self):
         return "form"
 
-    def send(session_id, data):
+    def send(self, session_id, data):
         return {
             "type": "daynamic_form",
             "channel": "socket",
@@ -298,7 +298,7 @@ class Qrcode(BluebotMessage):
     def type_name(self):
         return "qrcode"
 
-    def send(session_id, data):
+    def send(self, session_id, data):
         d = data[0]
         return {
             "is_received": True,
@@ -319,7 +319,7 @@ class SoundText(BluebotMessage):
     def type_name(self):
         return "sound_text"
 
-    def send(session_id, data):
+    def send(self, session_id, data):
         d = data[0]
         return {
             "is_received": True,
@@ -337,7 +337,7 @@ class GetUserLocation(BluebotMessage):
     def type_name(self):
         return "get_user_location"
 
-    def send(session_id, data):
+    def send(self, session_id, data):
         return {
             "type": "get_user_location",
             "channel": "socket",
@@ -356,7 +356,7 @@ class RangeSlider(BluebotMessage):
     def type_name(self):
         return "range_slider"
 
-    def send(session_id, data):
+    def send(self, session_id, data):
         return {
             "type": "range_slider",
             "channel": "socket",
@@ -373,7 +373,7 @@ class MultiSelect(BluebotMessage):
     def type_name(self):
         return "multi_select"
 
-    def send(session_id, data):
+    def send(self, session_id, data):
         return {
             "type": "multi_select",
             "channel": "socket",
@@ -390,7 +390,7 @@ class GetDirection(BluebotMessage):
     def type_name(self):
         return "get_direction"
 
-    def send(session_id, data):
+    def send(self, session_id, data):
         return {
             "type": "get_map_direction",
             "channel": "socket",
@@ -409,7 +409,7 @@ class GetOtp(BluebotMessage):
     def type_name(self):
         return "get_otp"
 
-    def send(session_id, data):
+    def send(self, session_id, data):
         return {
             "type": "otp",
             "channel": "socket",
@@ -429,7 +429,7 @@ class Callbackform(BluebotMessage):
     def type_name(self):
         return "callbackform"
 
-    def send(session_id, data):
+    def send(self, session_id, data):
         return {
             "type": "callback_form",
             "input_disable": "true",
@@ -449,7 +449,7 @@ class ChatWithLiveagent(BluebotMessage):
     def type_name(self):
         return "chat_with_liveagent"
 
-    def send(session_id, data):
+    def send(self, session_id, data):
         return {
             "type": "chat_transcript",
             "channel": "socket",
@@ -467,7 +467,7 @@ class EndSession(BluebotMessage):
     def type_name(self):
         return "end_session"
 
-    def send(session_id, data):
+    def send(self, session_id, data):
         return {
             "type": "end_session"
         }
@@ -480,7 +480,7 @@ class RestartSession(BluebotMessage):
     def type_name(self):
         return "restart_session"
 
-    def send(session_id, data):
+    def send(self, session_id, data):
         return {
             "type": "restart_session"
         }
@@ -493,7 +493,7 @@ class Newlink(BluebotMessage):
     def type_name(self):
         return "newlink"
 
-    def send(session_id, data):
+    def send(self, session_id, data):
         return {
             "is_received": True,
             "type": "newlink",
@@ -510,7 +510,7 @@ class Download(BluebotMessage):
     def type_name(self):
         return "download"
 
-    def send(session_id, data):
+    def send(self, session_id, data):
         file_send = data[0]
         return {
             "is_received": True,
@@ -528,7 +528,7 @@ class TenancyForm(BluebotMessage):
     def type_name(self):
         return "tenancy_form"
 
-    def send(session_id, data):
+    def send(self, session_id, data):
         form_data = data[0]
         return {
             "type": "tenancy_form",
@@ -549,7 +549,7 @@ class NewUserForm(BluebotMessage):
     def type_name(self):
         return "new_user_form"
 
-    def send_new_user_form(session_id, message=None):
+    def send_new_user_form(self, session_id, message=None):
         return {
             "type": "new_user_form",
             "channel": "socket",
