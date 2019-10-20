@@ -1,6 +1,6 @@
 import inspect
 import bl_core.core_util as core_util
-from .core.message import BluebotMessage
+from .bluemessage import BluebotMessage
 
 class MessageExecutor():
     def __init__(self):
