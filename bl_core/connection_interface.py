@@ -57,7 +57,7 @@ try:
         if os.path.isdir('./models/nlu/en'):
             nlu_interpreter_en = RasaNLUInterpreter('./models/nlu/en/')
             agent_en = Agent.load('./models/core/core.tar.gz',
-                                  interpreter=nlu_interpreter_idn,
+                                  interpreter=nlu_interpreter_en,
                                   action_endpoint=action_endpoint,
                                   generator=nlg_endpoint,
                                   tracker_store=mongo_tracker)
