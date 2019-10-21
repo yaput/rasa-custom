@@ -2,7 +2,7 @@ import asyncio
 import json
 import re
 import time
-import os
+import os, sys
 
 from flask import Flask, Response, request
 from gevent.pywsgi import WSGIServer
@@ -55,9 +55,8 @@ try:
         else:
             pass
         if os.path.isdir('./models/nlu/en'):
-            nlu_interpreter_en = RasaNLUInterpreter('./models/nlu/en/')
-            agent_en = Agent.load('./models/core/core.tar.gz',
-                                  interpreter=nlu_interpreter_en,
+            # nlu_interpreter_en = RasaNLUInterpreter('./models/nlu/en/')
+            agent_en = Agent.load('./models/models.tar.gz',
                                   action_endpoint=action_endpoint,
                                   generator=nlg_endpoint,
                                   tracker_store=mongo_tracker)
@@ -174,7 +173,6 @@ def handle_websocket(websocket, lang):
                 session_message = message['user']
                 store_user(session_message, websocket)
                 text_message = message['text']
-                
                 msgRasa = UserMessage(sender_id=session_message,text=text_message)
                 if text_message == "/restart" or text_message == "restart":
                     pause_user(session_message, pause=False)
@@ -186,9 +184,10 @@ def handle_websocket(websocket, lang):
                 update_lang(session_message, slots['language'])
 
                 if not isPause(session_message):
-                    # loop = asyncio.new_event_loop()
-                    # asyncio.set_event_loop(loop)
                     responses = loop.run_until_complete(agent.handle_message(msgRasa))
+                    print("-- debug --")
+                    print(msgRasa)
+                    print(responses)
                     for response in responses:
                         log_message = ""
                         if 'text' in response.keys():
@@ -200,12 +199,15 @@ def handle_websocket(websocket, lang):
                         websocket.send(json.dumps(message_exec.send_typing()))
                         time.sleep(1.5)
                         parsed_message = message_exec.parse(response)
+                        print(parsed_message)
                         websocket.send(json.dumps(parsed_message))
                 else:
                     dashlog.log("incoming", None, session_message,queryText=text_message,intent_name='Human In The Loop')
+        except KeyboardInterrupt:
+            sys.exit()
         except WebSocketError as ex:
             print(ex)
-
+        
 
 if __name__ == '__main__':
     userTrack = UserTracker()

@@ -5,7 +5,7 @@ from .message import MessageExecutor
 
 config = load_config()
 template_message = None
-with open('./data/database/master/response.json' % config["template"]["module"], encoding='utf8') as temp:
+with open('./data/database/response.json', encoding='utf8') as temp:
     template_message = json.load(temp)
 
 # Init message sender executor
