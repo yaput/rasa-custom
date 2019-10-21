@@ -541,25 +541,21 @@ class TenancyForm(BluebotMessage):
             }
         }
 
-class NewUserForm(BluebotMessage):
+class AirportInfo(BluebotMessage):
     """
-        tenancy_form was not present
+        Airport card info for Airport Chatbot
     """
 
     def type_name(self):
-        return "new_user_form"
+        return "airport_ticket"
 
-    def send_new_user_form(self, session_id, message=None):
+    def send(self, session_id, data):
         return {
-            "type": "new_user_form",
+            "is_received": True,
+            "type": "airport_ticket",
             "channel": "socket",
-            "input_disable": "true",
-            "content": {
-                "type": "new_user_form",
-                "text": "Super! I would appreciate it if you could fill out the form (for the patient) below to help me book you in. 😎"
-            }
+            "data":data
         }
-
 
 
 # import smtplib
