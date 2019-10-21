@@ -312,9 +312,18 @@ def send_tenancy_form(session_id, data):
          }
     }
 
+def send_flightinfo(session_id, data):
+    return {
+        "is_received": True,
+        "type": "airport_ticket",
+        "channel": "socket",
+        "data":data
+    }
+
 def parse_bot_response(response):
     session_id = response['recipient_id']
     map_attachment_response = {
+        "airport_ticket": send_flightinfo,
         'carousel': send_carousel,
         'quickreplies': send_quickreplies,
         'existing_user_form': send_existing_user_form,
