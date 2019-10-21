@@ -19,7 +19,7 @@ class MessageExecutor():
     def parse(self, request):
         session_id = request['recipient_id']
         data = None
-        method_type = "message"
+        method_type = "text"
         if 'text' in request.keys():
             data = request['text']
         elif 'attachment' in request.keys():
@@ -32,8 +32,8 @@ class MessageExecutor():
         
         try:
             return self.methods[method_type].send(session_id, data)
-        except:
-            return self.methods['message'].send(session_id, data) 
+        except Exception as e:
+            return self.methods['text'].send(session_id, data) 
 
     def send_typing(self):
         return {"type":"typing"}

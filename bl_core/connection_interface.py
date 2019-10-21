@@ -55,8 +55,9 @@ try:
         else:
             pass
         if os.path.isdir('./models/nlu/en'):
-            # nlu_interpreter_en = RasaNLUInterpreter('./models/nlu/en/')
-            agent_en = Agent.load('./models/models.tar.gz',
+            nlu_interpreter_en = RasaNLUInterpreter('./models/nlu/en/')
+            agent_en = Agent.load('./models/core/core.tar.gz',
+                                  interpreter=nlu_interpreter_idn,
                                   action_endpoint=action_endpoint,
                                   generator=nlg_endpoint,
                                   tracker_store=mongo_tracker)
@@ -185,9 +186,6 @@ def handle_websocket(websocket, lang):
 
                 if not isPause(session_message):
                     responses = loop.run_until_complete(agent.handle_message(msgRasa))
-                    print("-- debug --")
-                    print(msgRasa)
-                    print(responses)
                     for response in responses:
                         log_message = ""
                         if 'text' in response.keys():
@@ -199,7 +197,6 @@ def handle_websocket(websocket, lang):
                         websocket.send(json.dumps(message_exec.send_typing()))
                         time.sleep(1.5)
                         parsed_message = message_exec.parse(response)
-                        print(parsed_message)
                         websocket.send(json.dumps(parsed_message))
                 else:
                     dashlog.log("incoming", None, session_message,queryText=text_message,intent_name='Human In The Loop')
