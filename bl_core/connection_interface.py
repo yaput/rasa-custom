@@ -152,57 +152,52 @@ def wsgi_app(environ, start_response):
 def handle_websocket(websocket, path):
     path_split = path.split('/')
     lang = path_split[len(path_split)-1]
-    agent = agent_all
-    if lang == "idn":
-        agent = agent_all['idn']
-    elif lang == "en":
-        agent = agent_all['en']
-    elif lang == "ar":
-        agent = agent_all['ar']
-    elif lang == "er":
-        agent = agent_all['er']
+    agent = agent_all.get(lang, None)
     session_message = None
-    if websocket != None:
-        try:
-            while True:
-                msg = websocket.receive()
-                try:
-                    message = json.loads(msg)
-                except:
-                    break
-                session_message = message['user']
-                store_user(session_message, websocket)
-                text_message = message['text']
-                msgRasa = UserMessage(sender_id=session_message,text=text_message)
-                if text_message == "/restart" or text_message == "restart":
-                    pause_user(session_message, pause=False)
+    if agent is not None:
+        if websocket is not None:
+            try:
+                while True:
+                    msg = websocket.receive()
+                    try:
+                        message = json.loads(msg)
+                    except:
+                        break
+                    session_message = message['user']
+                    store_user(session_message, websocket)
+                    text_message = message['text']
+                    msgRasa = UserMessage(sender_id=session_message,text=text_message)
+                    if text_message == "/restart" or text_message == "restart":
+                        pause_user(session_message, pause=False)
 
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-                t = loop.run_until_complete(agent.log_message(msgRasa))
-                slots = t.current_slot_values()
-                update_lang(session_message, slots['language'])
+                    loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(loop)
+                    t = loop.run_until_complete(agent.log_message(msgRasa))
+                    slots = t.current_slot_values()
+                    update_lang(session_message, slots['language'])
 
-                if not isPause(session_message):
-                    responses = loop.run_until_complete(agent.handle_message(msgRasa))
-                    for response in responses:
-                        log_message = ""
-                        if 'text' in response.keys():
-                            log_message = response['text']
-                        else:
-                            log_message = json.dumps(response['attachment'], indent=3)
-                        dashlog.log("outgoing", response,response['recipient_id'])
-                        time.sleep(1)
-                        websocket.send(json.dumps(message_exec.send_typing()))
-                        time.sleep(1.5)
-                        parsed_message = message_exec.parse(response)
-                        websocket.send(json.dumps(parsed_message))
-                else:
-                    dashlog.log("incoming", None, session_message,queryText=text_message,intent_name='Human In The Loop')
-        except KeyboardInterrupt:
-            sys.exit()
-        except WebSocketError as ex:
-            print(ex)
+                    if not isPause(session_message):
+                        responses = loop.run_until_complete(agent.handle_message(msgRasa))
+                        for response in responses:
+                            log_message = ""
+                            if 'text' in response.keys():
+                                log_message = response['text']
+                            else:
+                                log_message = json.dumps(response['attachment'], indent=3)
+                            dashlog.log("outgoing", response,response['recipient_id'])
+                            time.sleep(1)
+                            websocket.send(json.dumps(message_exec.send_typing()))
+                            time.sleep(1.5)
+                            parsed_message = message_exec.parse(response)
+                            websocket.send(json.dumps(parsed_message))
+                    else:
+                        dashlog.log("incoming", None, session_message,queryText=text_message,intent_name='Human In The Loop')
+            except KeyboardInterrupt:
+                sys.exit()
+            except WebSocketError as ex:
+                print(ex)
+    else:
+        raise Exception(f"Agent not found, agent: {agent}")
         
 
 if __name__ == '__main__':
