@@ -21,6 +21,10 @@ from .message import MessageExecutor
 from .tracker import Tracker
 from .user_map import (isPause, pause_user, send_message, store_user,
                       user_map, UserTracker, update_lang)
+from urllib import parse
+from hashlib import md5
+
+
 
 app = Flask(__name__)
 app.debug = True
@@ -116,38 +120,52 @@ def liveperson():
     send_message(userID, req_data['text'])
     return Response("OK")
 
+def authorized_connection(environ):
+    try:
+        query = parse.parse_qs(environ['QUERY_STRING'])
+        token = query.get('token', None)
+        timestamp = query.get('timestamp', None)
+        hashed = md5((str(timestamp[0])+"THIS_IS_SECRET_KEY_PLEASE_KEEP_IT_AS_A_SECRET").encode())
+        if token is not None and timestamp is not None:
+            if (hashed.hexdigest() == token[0]):
+                return True
+        return False
+    except Exception as e:
+        print(f"Can't authorized connection: {e.args}")
+        return False
 
-def wsgi_app(environ, start_response):  
+
+def wsgi_app(environ, start_response):
     path = environ["PATH_INFO"]  
-    if path == "/ws/en":
-        try:  
-            handle_websocket(environ["wsgi.websocket"], "en")
-        except Exception as e:
-            print(e)
-            print("Stop Connection")
-        return []
-    elif path == '/ws/idn':
-        try:  
-            handle_websocket(environ["wsgi.websocket"], "idn")
-        except Exception as e:
-            print(e)
-            print("Stop Connection")
-        return []
-    elif path== '/ws/ar':
-        try:
-            handle_websocket(environ["wsgi.websocket"], "ar")
-        except Exception as e:
-            print(e)
-            print("Stop Connection")
-        return []
-    elif path == '/ws/er':
-        try:
-            handle_websocket(environ["wsgi.websocket"], "er")
-        except Exception as e:
-            print(e)
-            print("Stop Connection")
-        return []
-
+    if authorized_connection(environ):
+        if path == "/ws/en":
+            try:  
+                handle_websocket(environ["wsgi.websocket"], "en")
+            except Exception as e:
+                print(e)
+                print("Stop Connection")
+            return []
+        elif path == '/ws/idn':
+            try:  
+                handle_websocket(environ["wsgi.websocket"], "idn")
+            except Exception as e:
+                print(e)
+                print("Stop Connection")
+            return []
+        elif path== '/ws/ar':
+            try:
+                handle_websocket(environ["wsgi.websocket"], "ar")
+            except Exception as e:
+                print(e)
+                print("Stop Connection")
+            return []
+        elif path == '/ws/er':
+            try:
+                handle_websocket(environ["wsgi.websocket"], "er")
+            except Exception as e:
+                print(e)
+                print("Stop Connection")
+            return []
     else:  
         return app(environ, start_response)
 
