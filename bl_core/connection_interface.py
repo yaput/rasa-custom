@@ -138,30 +138,9 @@ def authorized_connection(environ):
 def wsgi_app(environ, start_response):
     path = environ["PATH_INFO"]  
     if authorized_connection(environ):
-        if path == "/ws/en":
+        if '/ws/' in path:
             try:  
-                handle_websocket(environ["wsgi.websocket"], "en")
-            except Exception as e:
-                print(e)
-                print("Stop Connection")
-            return []
-        elif path == '/ws/idn':
-            try:  
-                handle_websocket(environ["wsgi.websocket"], "idn")
-            except Exception as e:
-                print(e)
-                print("Stop Connection")
-            return []
-        elif path== '/ws/ar':
-            try:
-                handle_websocket(environ["wsgi.websocket"], "ar")
-            except Exception as e:
-                print(e)
-                print("Stop Connection")
-            return []
-        elif path == '/ws/er':
-            try:
-                handle_websocket(environ["wsgi.websocket"], "er")
+                handle_websocket(environ["wsgi.websocket"], path)
             except Exception as e:
                 print(e)
                 print("Stop Connection")
@@ -170,7 +149,9 @@ def wsgi_app(environ, start_response):
         return app(environ, start_response)
 
 
-def handle_websocket(websocket, lang):
+def handle_websocket(websocket, path):
+    path_split = path.split('/')
+    lang = path_split[len(path_split)-1]
     agent = agent_all
     if lang == "idn":
         agent = agent_all['idn']
