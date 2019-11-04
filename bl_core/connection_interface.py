@@ -70,8 +70,7 @@ try:
             pass
         if os.path.isdir('./models/nlu/ar'):
             nlu_interpreter_ar = RasaNLUInterpreter('./models/nlu/ar/')
-            agent_ar = Agent.load('./models/core/core.tar.'
-                                  'gz',
+            agent_ar = Agent.load('./models/core/core.tar.gz',
                                   interpreter=nlu_interpreter_ar,
                                   action_endpoint=action_endpoint,
                                   generator=nlg_endpoint,

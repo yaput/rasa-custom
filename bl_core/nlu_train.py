@@ -13,8 +13,6 @@ def train_nlu(name, lang="en",production_build=False):
     trainer.persist('./models/nlu/'+lang+"/", fixed_model_name=model_name)
 
 import sys
-data = "hello"
-lang = "en"
 
 if sys.argv[1] == '--name':
     data = str(sys.argv[2])
