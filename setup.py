@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='bl_core',
-      version='1.3.7',
+      version='1.4.0',
       url='',
       author='Blue Logic',
       author_email='anton@bluelogic.ae',
@@ -10,7 +10,6 @@ setup(name='bl_core',
       install_requires=[
           'rasa==1.3.7',
           'rasa-sdk==1.3.3',
-          'chatbase',
           'gevent-websocket',
           'waitress'
       ],

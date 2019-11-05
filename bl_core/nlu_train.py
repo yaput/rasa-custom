@@ -7,7 +7,7 @@ def train_nlu(name, lang="en",production_build=False):
     if not production_build:
         model_name = "latest"
 
-    training_data = load_data('./data/'+name+'/nlu/'+lang+"/")
+    training_data = load_data('./data/nlu/'+lang+"/")
     trainer = Trainer(config.load("config.yml"))
     trainer.train(training_data)
     trainer.persist('./models/nlu/'+lang+"/", fixed_model_name=model_name)
