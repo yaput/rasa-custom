@@ -9,7 +9,7 @@ setup(name='bl_core',
       packages=['bl_core'],
       install_requires=[
           'rasa==1.4.2',
-          'rasa-sdk==1.3.3',
+          'rasa-sdk==1.4.0',
           'gevent-websocket',
           'waitress'
       ],
