@@ -1,6 +1,7 @@
 import asyncio
 import json
 import re
+import threading
 import time
 import os, sys
 
@@ -17,6 +18,10 @@ from rasa.core.domain import Domain
 
 from .config import load_config
 from .message import MessageExecutor
+
+from pydashbot.tracker import Tracker
+from pymessenger.bot import Bot
+from bl_core.facebook_parser import *
 
 from .tracker import Tracker
 from .user_map import (isPause, pause_user, send_message, store_user,
@@ -44,6 +49,7 @@ domain = Domain.load('domain.yml')
 db_conf = config['bluelog']
 mongo_tracker = MongoTrackerStore(domain, host=db_conf['host'], db=db_conf['db'], username=db_conf['username'], password=db_conf['password'], auth_source=db_conf['authsource'], collection=config['template']['module'])
 
+
 agent_all = {}
 
 try:
@@ -59,7 +65,7 @@ try:
         else:
             pass
         if os.path.isdir('./models/nlu/en'):
-            nlu_interpreter_en = RasaNLUInterpreter('./models/nlu/en/')
+            nlu_interpreter_en = RasaNLUInterpreter('./models/nlu/en/latest')
             agent_en = Agent.load('./models/core/core.tar.gz',
                                   interpreter=nlu_interpreter_en,
                                   action_endpoint=action_endpoint,
@@ -97,6 +103,95 @@ except Exception as e:
              "en": agent_en,
              "ar": agent_ar,
              "er": agent_er}"""
+
+
+class HandleFacebookMessage(threading.Thread):
+    def __init__(self, sender_id, used_message, agent_fb):
+        self.sender_id = sender_id
+        self.used_message = used_message
+        self.agent = agent_fb
+        super(HandleFacebookMessage, self).__init__()
+
+    def run(self):
+        msgRasa = UserMessage(sender_id=self.sender_id, text=self.used_message)
+        session_message = self.sender_id
+        t = self.agent.log_message(msgRasa)
+        print(" this is t, ", t)
+        slots = t.current_slot_values()
+        print("this is the slots, ", slots)
+        if slots['language']== None:
+            slots['language'] = 'en'
+        updated = update_lang(session_message, slots['language'])
+        if self.used_message == "/restart" or self.used_message == "restart":
+            pause_user(self.sender_id, pause=False)
+
+        if not isPause(self.sender_id):
+            responses = self.agent.handle_message(msgRasa)
+            for response in responses:
+                dashlog.log("outgoing", response, response['recipient_id'])
+                fb_parse_bot_response(self.sender_id, response)
+
+
+def verify_fb_token(token_sent):
+    # take token sent by facebook and verify it matches the verify token you sent
+    # if they match, allow the request, else return an error
+    if token_sent == VERIFY_TOKEN:
+        return request.args.get("hub.challenge")
+    return 'Invalid verification token'
+
+
+def load_facebook_agent(nlu_interpreter_en, action_endpoint, nlg_endpoint, mongo_tracker):
+    agent_fb = Agent.load('./models/' + config['template']['module'] + '/dialogue_fb', interpreter=nlu_interpreter_en,
+                          action_endpoint=action_endpoint, generator=nlg_endpoint, tracker_store=mongo_tracker)
+    return agent_fb
+
+
+@app.route("/fbWebhook", methods=["GET", "POST"])
+def handle_facebook_message():
+    if request.method == 'GET':
+        """Before allowing people to message your bot, Facebook has implemented a verify token
+        that confirms all requests that your bot receives came from Facebook."""
+        token_sent = request.args.get("hub.verify_token")
+        return verify_fb_token(token_sent)
+    # if the request was not get, it must be POST and we can just proceed with sending a message back to user
+    # get whatever message a user sent the bot
+    else:
+        try:
+            input_msg = request.get_json()
+            entry = input_msg.get('entry', None)
+            msg = entry[0].get('messaging', None)
+            msg_payload = msg[0]
+            sender_id = msg_payload['sender']['id']
+            store_user(sender_id, None)
+            message = msg_payload.get('message', None)
+            postback = msg_payload.get('postback', None)
+            used_message = None
+            if 'delivery' not in msg[0].keys():
+                if message != None:
+                    msg_key = message.keys()
+                    if 'is_echo' in msg_key or 'read' in msg_key or 'delivery' in msg_key:
+                        used_message = None
+                        pass
+                    elif 'quick_reply' in msg_key:
+                        # print(message.get('quick_reply', None))
+                        used_message = message['quick_reply']['payload']
+                    elif 'text' in msg_key:
+                        # print(message.get('text', None))
+                        used_message = message.get('text', None)
+                    elif 'attachments' in msg_key:
+                        pass
+                elif postback != None:
+                    used_message = postback['payload']
+
+                if used_message != None:
+                    agent_fb = load_facebook_agent(nlu_interpreter_en, nlg_endpoint, action_endpoint, mongo_tracker)
+                    task = HandleFacebookMessage(sender_id, used_message, agent_fb)
+                    task.start()
+
+        except Exception as e:
+            print('---debug error ----', e.args)
+
+        return "success"
 
 
 @app.route("/pause", methods=['POST'])
