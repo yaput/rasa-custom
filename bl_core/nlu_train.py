@@ -14,8 +14,8 @@ def train_nlu(lang="en",production_build=False):
 
 import sys
 
+if sys.argv[1] == '--lang':
+    lang = str(sys.argv[2])
 
-if sys.argv[3] == '--lang':
-    lang = str(sys.argv[4])
 
 train_nlu(lang)
