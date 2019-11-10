@@ -2,7 +2,7 @@ from rasa.nlu.training_data import load_data
 from rasa.nlu.model import Trainer
 from rasa.nlu import config
 
-def train_nlu(name, lang="en",production_build=False):
+def train_nlu(lang="en",production_build=False):
     model_name = "production"
     if not production_build:
         model_name = "latest"
@@ -14,10 +14,8 @@ def train_nlu(name, lang="en",production_build=False):
 
 import sys
 
-if sys.argv[1] == '--name':
-    data = str(sys.argv[2])
 
 if sys.argv[3] == '--lang':
     lang = str(sys.argv[4])
 
-train_nlu(data, lang)
+train_nlu(lang)
