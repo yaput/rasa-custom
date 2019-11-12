@@ -205,8 +205,9 @@ def handle_whatsapp_messages():
             msg = request.values.get('Body', None)
             msgRasa = UserMessage(text=msg)
             resp = MessagingResponse()
-            agent_fb = load_facebook_agent(nlu_interpreter_en, action_endpoint, nlg_endpoint, mongo_tracker)
-            responses = agent_fb.handle_message(msgRasa)
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            responses = loop.run_until_complete(agent_en.handle_message(msgRasa))
             for response in responses:
                 resp.message(response['text'])
             return str(resp)
