@@ -203,13 +203,18 @@ def handle_whatsapp_messages():
     else:
         try:
             msg = request.values.get('Body', None)
+            numMedia = request.values.get('num_media', None)
             msgRasa = UserMessage(text=msg)
             resp = MessagingResponse()
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             responses = loop.run_until_complete(agent_en.handle_message(msgRasa))
             for response in responses:
-                resp.message(response['text'])
+                if numMedia>0:
+                    resp.message(response['text'])
+                    resp.message().media("thank-you-lettering.jpg") # Insert media link into the media function
+                else:
+                    resp.message(response['text'])
             return str(resp)
         except Exception as e:
             print('---debug error ----', e.args)
