@@ -119,16 +119,24 @@ def liveperson():
     send_message(userID, req_data['text'])
     return Response("OK")
 
+@app.route("/hello")
+def hello():
+    return "OK"
+
+
 def authorized_connection(environ):
     try:
-        query = parse.parse_qs(environ['QUERY_STRING'])
-        token = query.get('token', None)
-        timestamp = query.get('timestamp', None)
-        hashed = md5((str(timestamp[0])+"THIS_IS_SECRET_KEY_PLEASE_KEEP_IT_AS_A_SECRET").encode())
-        if token is not None and timestamp is not None:
-            if (hashed.hexdigest() == token[0]):
-                return True
-        return False
+        if environ is not None:
+            query = parse.parse_qs(environ['QUERY_STRING'])
+            token = query.get('token', None)
+            timestamp = query.get('timestamp', None)
+            hashed = md5((str(timestamp[0])+"THIS_IS_SECRET_KEY_PLEASE_KEEP_IT_AS_A_SECRET").encode())
+            if token is not None and timestamp is not None:
+                if (hashed.hexdigest() == token[0]):
+                    return True
+            return False
+        else:
+            return True
     except Exception as e:
         print(f"Can't authorized connection: {e.args}")
         return False
@@ -136,14 +144,16 @@ def authorized_connection(environ):
 
 def wsgi_app(environ, start_response):
     path = environ["PATH_INFO"]  
-    if authorized_connection(environ):
-        if '/ws/' in path:
-            try:  
+    if '/ws/' in path:
+        try:  
+            if authorized_connection(environ):
                 handle_websocket(environ["wsgi.websocket"], path)
-            except Exception as e:
-                print(e)
-                print("Stop Connection")
-            return []
+            else:
+                raise Exception("Unauthorized")
+        except Exception as e:
+            print(e)
+            print("Stop Connection")
+        return []
     else:  
         return app(environ, start_response)
 
