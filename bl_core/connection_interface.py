@@ -29,6 +29,9 @@ from .user_map import (isPause, pause_user, send_message, store_user,
 from urllib import parse
 from hashlib import md5
 
+from twilio.rest import Client
+from twilio.twiml.messaging_response import MessagingResponse
+
 
 
 app = Flask(__name__)
@@ -191,6 +194,24 @@ def handle_facebook_message():
         except Exception as e:
             print('---debug error ----', e.args)
 
+        return "success"
+
+@app.route("/whatsappAPI", methods=['POST'])
+def handle_whatsapp_messages():
+    if request.method == "GET":
+        pass
+    else:
+        try:
+            msg = request.values.get('Body', None)
+            msgRasa = UserMessage(text=msg)
+            resp = MessagingResponse()
+            agent_fb = load_facebook_agent(nlu_interpreter_en, action_endpoint, nlg_endpoint, mongo_tracker)
+            responses = agent_fb.handle_message(msgRasa)
+            for response in responses:
+                resp.message(response['text'])
+            return str(resp)
+        except Exception as e:
+            print('---debug error ----', e.args)
         return "success"
 
 
