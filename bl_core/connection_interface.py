@@ -69,6 +69,10 @@ def liveperson():
     send_message(userID, req_data['text'])
     return Response("OK")
 
+@app.route('/')
+def test():
+    return "OK"
+
 def wsgi_app(environ, start_response):  
     path = environ["PATH_INFO"]  
     if path == "/ws/en":
@@ -138,6 +142,6 @@ def handle_websocket(websocket, lang):
 if __name__ == '__main__':
     userTrack = UserTracker()
     userTrack.start()
-    http_server = WSGIServer((host,port), wsgi_app, handler_class=WebSocketHandler)
+    http_server = WSGIServer((host,port), wsgi_app, handler_class=WebSocketHandler, keyfile="key.pem", certfile='cert.pem')
     print('Server started at %s:%s'%(host,port))
     http_server.serve_forever()
