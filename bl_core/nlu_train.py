@@ -16,6 +16,4 @@ import sys
 
 if sys.argv[1] == '--lang':
     lang = str(sys.argv[2])
-
-
-train_nlu(lang)
+    train_nlu(lang)
