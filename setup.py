@@ -8,8 +8,8 @@ setup(name='bl_core',
       license='MIT',
       packages=['bl_core'],
       install_requires=[
-          'rasa==1.3.7',
-          'rasa-sdk==1.3.0',
+          'rasa==1.4.5',
+          'rasa-sdk==1.4.0',
           'gevent-websocket',
           'waitress'
       ],
