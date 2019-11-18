@@ -142,6 +142,6 @@ def handle_websocket(websocket, lang):
 if __name__ == '__main__':
     userTrack = UserTracker()
     userTrack.start()
-    http_server = WSGIServer((host,port), wsgi_app, handler_class=WebSocketHandler, keyfile="livechat_aam_gov_ae.pfx", certfile='livechat_aam_gov_ae.crt')
+    http_server = WSGIServer((host,port), wsgi_app, handler_class=WebSocketHandler, certfile='certificate.crt')
     print('Server started at %s:%s'%(host,port))
     http_server.serve_forever()
