@@ -142,6 +142,6 @@ def handle_websocket(websocket, lang):
 if __name__ == '__main__':
     userTrack = UserTracker()
     userTrack.start()
-    http_server = WSGIServer((host,port), wsgi_app, handler_class=WebSocketHandler, keyfile="key.pem", certfile='certificate.crt')
+    http_server = WSGIServer((host,port), wsgi_app, handler_class=WebSocketHandler, keyfile="client_key.pem", certfile='client_ssl.pem')
     print('Server started at %s:%s'%(host,port))
     http_server.serve_forever()
