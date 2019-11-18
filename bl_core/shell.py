@@ -2,7 +2,7 @@ from rasa.nlu.model import Interpreter
 
 
 def run(lang):
-   interpreter = Interpreter.load('./models/nlu/'+lang+'latest/')
+   interpreter = Interpreter.load('./models/nlu/'+lang+'/latest/')
    print("**type your words**")
    while True:
        word = input()
