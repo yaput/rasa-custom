@@ -206,6 +206,7 @@ def handle_whatsapp_messages():
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             if msg is not None or msg != " " or msg != "":
+                print("this is sender id",sender_id)
                 msgRasa = UserMessage(text=msg, sender_id=sender_id)
                 responses = loop.run_until_complete(agent_en.handle_message(msgRasa))
                 for response in responses:
