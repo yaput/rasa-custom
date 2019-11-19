@@ -200,7 +200,7 @@ def handle_whatsapp_messages():
     else:
         try:
             msg = request.values.get('Body')
-            sender_id = request.values.get('from')
+            sender_id = request.values.get('From')
             numMedia = int(request.values.get('NumMedia'))
             resp = MessagingResponse()
             loop = asyncio.new_event_loop()
