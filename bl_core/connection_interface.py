@@ -199,6 +199,7 @@ def handle_whatsapp_messages():
         pass
     else:
         try:
+            print("this is request, ", request)
             msg = request.values.get('Body')
             numMedia = int(request.values.get('NumMedia'))
             resp = MessagingResponse()
