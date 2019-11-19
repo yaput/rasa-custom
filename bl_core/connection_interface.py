@@ -199,14 +199,14 @@ def handle_whatsapp_messages():
         pass
     else:
         try:
-            print("this is request, ", request)
             msg = request.values.get('Body')
+            sender_id = request.values.get('from')
             numMedia = int(request.values.get('NumMedia'))
             resp = MessagingResponse()
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             if msg is not None or msg != " " or msg != "":
-                msgRasa = UserMessage(text=msg)
+                msgRasa = UserMessage(text=msg, sender_id=sender_id)
                 responses = loop.run_until_complete(agent_en.handle_message(msgRasa))
                 for response in responses:
                     if numMedia>0:
