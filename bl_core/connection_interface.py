@@ -26,7 +26,7 @@ from .core_util import parse_bot_response, send_typing
 
 from .tracker import Tracker
 from .user_map import (isPause, pause_user, pop_user, send_message, store_user,
-                      user_map, UserTracker, update_lang)
+                      user_map, UserTracker, update_lang, send_json)
 
 app = Flask(__name__)
 app.debug = True
@@ -67,6 +67,16 @@ def liveperson():
     if not isPause(userID):
         pause_user(userID)
     send_message(userID, req_data['text'])
+    return Response("OK")
+
+@app.route("/send_json", methods=["POST"])
+def liveperson():
+    req_data = request.get_json()
+    userID = req_data['userId']
+    if not isPause(userID):
+        pause_user(userID)
+    parsed_message = parse_bot_response(req_data['json'])
+    send_json(userID,json.dumps(parsed_message))
     return Response("OK")
 
 @app.route('/')

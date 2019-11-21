@@ -45,6 +45,15 @@ def send_message(userID, message):
         print("Closed Connection")
         return
 
+def send_json(userID, json):
+    if not user_map[userID]["paused"]:
+        user_map[userID]["paused"] = True
+    try:
+        user_map[userID]['conn'].send(json.dumps(json))
+    except:
+        print("Closed Connection")
+        return
+
 def pause_user(userID, pause=True):
     user = None
     try:
