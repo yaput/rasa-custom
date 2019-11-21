@@ -70,7 +70,7 @@ def liveperson():
     return Response("OK")
 
 @app.route("/send_json", methods=["POST"])
-def send_json():
+def send_data_from_chatbot():
     req_data = request.get_json()
     userID = req_data['userId']
     if not isPause(userID):
