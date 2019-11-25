@@ -202,6 +202,7 @@ def handle_whatsapp_messages():
             msg = request.values.get('Body')
             sender_id = request.values.get('From')
             numMedia = int(request.values.get('NumMedia'))
+            print(request)
             resp = MessagingResponse()
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
@@ -212,7 +213,6 @@ def handle_whatsapp_messages():
                     if numMedia>0:
                         resp.message(response['text'])
                         resp.message().media("thank-you-lettering.jpg") # Insert media link into the media function
-                        print(resp.message(response['location']))
                     else:
                         resp.message(response['text'])
                 return str(resp)
