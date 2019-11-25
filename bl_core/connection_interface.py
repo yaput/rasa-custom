@@ -212,6 +212,7 @@ def handle_whatsapp_messages():
                     if numMedia>0:
                         resp.message(response['text'])
                         resp.message().media("thank-you-lettering.jpg") # Insert media link into the media function
+                        print(resp.message(response['location']))
                     else:
                         resp.message(response['text'])
                 return str(resp)
