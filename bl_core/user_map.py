@@ -41,7 +41,8 @@ def send_message(userID, message):
             'user':userID,
             'channel':'socket'
         }))
-    except:
+    except Exception as e:
+        print(f"**** Exception: {e.args}")
         print("Closed Connection")
         return
 
@@ -50,7 +51,8 @@ def send_json(userID, json):
         user_map[userID]["paused"] = True
     try:
         user_map[userID]['conn'].send(json.dumps(json))
-    except:
+    except Exception as e:
+        print(f"**** Exception: {e.args}")
         print("Closed Connection")
         return
 
