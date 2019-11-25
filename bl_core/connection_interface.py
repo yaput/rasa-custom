@@ -77,7 +77,7 @@ def send_data_from_chatbot():
         pause_user(userID)
     msg = req_data['json']
     parsed_message = parse_bot_response({"attachment":msg, "recipient_id": userID})
-    send_json(userID,json.dumps(parsed_message))
+    send_json(userID, parsed_message)
     return Response("OK")
 
 @app.route('/')
