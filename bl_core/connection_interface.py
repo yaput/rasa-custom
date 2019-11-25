@@ -76,8 +76,7 @@ def send_data_from_chatbot():
     if not isPause(userID):
         pause_user(userID)
     msg = req_data['json']
-    msg['recipient_id'] = userID
-    parsed_message = parse_bot_response({"attachment":msg})
+    parsed_message = parse_bot_response({"attachment":msg, "recipient_id": userID})
     send_json(userID,json.dumps(parsed_message))
     return Response("OK")
 
