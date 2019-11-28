@@ -1,72 +1,82 @@
-import json, requests, random
+import json
+import requests
+import random
 from .bluemessage import BluebotMessage
+
 
 class QuickReplies(BluebotMessage):
     """
         Handle Quick Replies request for front end
     """
+
     def type_name(self):
         return "quickreplies"
-    
+
     def send(self, session_id, data):
         return {
-            "text": data[0].get('text',""),
+            "text": data[0].get('text', ""),
             "quick_replies": data[0]['replies'],
-            "channel":"socket",
+            "channel": "socket",
             "user": session_id,
             "to": session_id,
-            "type":"message",
+            "type": "message",
             "input_disable": data[0].get('input_disable', 'false'),
         }
+
 
 class EmptyMessage(BluebotMessage):
     """
         Handle Empty message for some certain conditions request for front end
     """
+
     def type_name(self):
         return "send_nothing"
-    
+
     def send(self, session_id, data):
         return {
-            "channel":"socket",
+            "channel": "socket",
             "user": session_id,
             "to": session_id,
-            "type":"skip_this",
+            "type": "skip_this",
             "input_disable": 'false',
         }
+
 
 class Carousel(BluebotMessage):
     """
         Handle Carousel or Cards request for front end
     """
+
     def type_name(self):
         return "carousel"
 
     def send(self, session_id, data):
         return {
-            "type":"carousel",
-            "text":"mainCarousel",
-            "data":data,
-            "channel":"socket",
-            "user":session_id,
-            "to":session_id
+            "type": "carousel",
+            "text": "mainCarousel",
+            "data": data,
+            "channel": "socket",
+            "user": session_id,
+            "to": session_id
         }
+
 
 class List(BluebotMessage):
     """
         Handle List request for front end
     """
+
     def type_name(self):
         return "list"
-    
+
     def send(self, session_id, list_data):
         return {
-            "type":"list",
-            "channel":"socket",
-            "text":"list",
+            "type": "list",
+            "channel": "socket",
+            "text": "list",
             "data": list_data,
-            "user":session_id,
-            "to":session_id
+            "user": session_id,
+            "to": session_id
         }
 
 
@@ -74,6 +84,7 @@ class Image(BluebotMessage):
     """
         Image was not present
     """
+
     def type_name(self):
         return "image"
 
@@ -88,10 +99,12 @@ class Image(BluebotMessage):
             "to": session_id
         }
 
+
 class Text(BluebotMessage):
     """
         Text was not present
     """
+
     def type_name(self):
         return "text"
 
@@ -110,6 +123,7 @@ class ExistingUserForm(BluebotMessage):
     """
         existing_user_form was not present
     """
+
     def type_name(self):
         return "existing_user_form"
 
@@ -120,11 +134,11 @@ class ExistingUserForm(BluebotMessage):
         }
 
 
-
 class DrivingLicenseForm(BluebotMessage):
     """
         driving_license_form was not present
     """
+
     def type_name(self):
         return "driving_license_form"
 
@@ -135,11 +149,11 @@ class DrivingLicenseForm(BluebotMessage):
         }
 
 
-
 class VehicleDetailForm(BluebotMessage):
     """
         vehicle_detail_form was not present
     """
+
     def type_name(self):
         return "vehicle_detail_form"
 
@@ -154,6 +168,7 @@ class PaymentForm(BluebotMessage):
     """
         payment_form was not present
     """
+
     def type_name(self):
         return "payment_form"
 
@@ -162,6 +177,7 @@ class PaymentForm(BluebotMessage):
             "type": "payment_request",
             "channel": "socket"
         }
+
 
 class FinalQoute(BluebotMessage):
     """
@@ -177,6 +193,7 @@ class FinalQoute(BluebotMessage):
             "channel": "socket"
         }
 
+
 class CompareQoute(BluebotMessage):
     """
         compare_qoute was not present
@@ -190,6 +207,7 @@ class CompareQoute(BluebotMessage):
             "type": "quote_request",
             "channel": "socket"
         }
+
 
 class EmailSendPopup(BluebotMessage):
     """
@@ -205,6 +223,7 @@ class EmailSendPopup(BluebotMessage):
             "channel": "socket"
         }
 
+
 class InvoiceDetails(BluebotMessage):
     """
         invoice_details was not present
@@ -218,6 +237,7 @@ class InvoiceDetails(BluebotMessage):
             "type": "invoice_display",
             "channel": "socket"
         }
+
 
 class EmailSendForm(BluebotMessage):
     """
@@ -233,6 +253,7 @@ class EmailSendForm(BluebotMessage):
             "channel": "socket"
         }
 
+
 class CreateAccountForm(BluebotMessage):
     """
         create_account_form was not present
@@ -246,6 +267,7 @@ class CreateAccountForm(BluebotMessage):
             "type": "register_account",
             "channel": "socket"
         }
+
 
 class SearchBar(BluebotMessage):
     """
@@ -272,6 +294,7 @@ class SearchBar(BluebotMessage):
             "text": data['text']
         }
 
+
 class Form(BluebotMessage):
     """
         form was not present
@@ -289,6 +312,7 @@ class Form(BluebotMessage):
                 "fields": data
             }
         }
+
 
 class Qrcode(BluebotMessage):
     """
@@ -311,6 +335,7 @@ class Qrcode(BluebotMessage):
             "channel": "socket"
         }
 
+
 class SoundText(BluebotMessage):
     """
         sound_text was not present
@@ -328,6 +353,7 @@ class SoundText(BluebotMessage):
             "channel": "socket",
             "link": d['sound']
         }
+
 
 class GetUserLocation(BluebotMessage):
     """
@@ -348,6 +374,7 @@ class GetUserLocation(BluebotMessage):
             }
         }
 
+
 class RangeSlider(BluebotMessage):
     """
         range_slider was not present
@@ -365,6 +392,7 @@ class RangeSlider(BluebotMessage):
             "data": data[0]['data']
         }
 
+
 class MultiSelect(BluebotMessage):
     """
         multi_select was not present
@@ -381,6 +409,7 @@ class MultiSelect(BluebotMessage):
             "input_disable": "true",
             "quick_replies": data[0]['quickreplies']
         }
+
 
 class GetDirection(BluebotMessage):
     """
@@ -400,6 +429,7 @@ class GetDirection(BluebotMessage):
             },
             "data": data
         }
+
 
 class GetOtp(BluebotMessage):
     """
@@ -421,6 +451,7 @@ class GetOtp(BluebotMessage):
             }
         }
 
+
 class Callbackform(BluebotMessage):
     """
         callbackform was not present
@@ -441,6 +472,7 @@ class Callbackform(BluebotMessage):
             }
         }
 
+
 class ChatWithLiveagent(BluebotMessage):
     """
         chat_with_liveagent was not present
@@ -459,6 +491,7 @@ class ChatWithLiveagent(BluebotMessage):
             }
         }
 
+
 class EndSession(BluebotMessage):
     """
         end_session was not present
@@ -472,6 +505,7 @@ class EndSession(BluebotMessage):
             "type": "end_session"
         }
 
+
 class RestartSession(BluebotMessage):
     """
         restart_session was not present
@@ -484,6 +518,7 @@ class RestartSession(BluebotMessage):
         return {
             "type": "restart_session"
         }
+
 
 class Newlink(BluebotMessage):
     """
@@ -502,6 +537,7 @@ class Newlink(BluebotMessage):
             }]
         }
 
+
 class Download(BluebotMessage):
     """
         download was not present
@@ -519,6 +555,7 @@ class Download(BluebotMessage):
             "channel": "socket",
             "data": [{"filename": file_send}]
         }
+
 
 class TenancyForm(BluebotMessage):
     """
@@ -541,6 +578,7 @@ class TenancyForm(BluebotMessage):
             }
         }
 
+
 class AirportInfo(BluebotMessage):
     """
         Airport card info for Airport Chatbot
@@ -554,49 +592,23 @@ class AirportInfo(BluebotMessage):
             "is_received": True,
             "type": "airport_ticket",
             "channel": "socket",
-            "data":data
+            "data": data
         }
 
 
-# import smtplib
-# from email.mime.text import MIMEText
-# from email.mime.multipart import MIMEMultipart
-# from email.mime.image import MIMEImage
-# from email import encoders
-# def sendMail(to, message_text, subject, cc =[], filename=""):
-#     gmail_user = 'cbcb@medcarehospital.com'  
-#     gmail_password = 'QazWsx@2020'
-#     email_to = to
-#     # Create the container email message.
-#     msg = MIMEMultipart()
-#     msg['Subject'] = subject
-#     msg['From'] = gmail_user
-#     msg['To'] = email_to
-#     msg['Cc'] = ','.join(cc)
-#     message_text = message_text
-#     msg.attach(MIMEText(message_text, 'plain'))
-#     if filename != "":
-#         with open(filename, encoding='utf8') as f:
-#             attachment = MIMEText(f.read())
-#             attachment.add_header('Content-Disposition', 'attachment', filename=filename)           
-#             msg.attach(attachment)
+class IframeLiveAgent(BluebotMessage):
+    """
+        Pop Up Live agent inside widget with iFrame
+    """
 
+    def type_name(self):
+        return "live_agent"
 
-#     text = msg.as_string()
-#     addresses = [email_to]
-#     if len(cc) > 0 :
-#         addresses =  addresses + cc
-
-#     try:  
-#         server = smtplib.SMTP('smtp-mail.outlook.com', 587)
-#         server.ehlo()
-#         server.starttls()
-#         server.ehlo()
-#         server.login(gmail_user, gmail_password)
-#         server.sendmail(gmail_user, ','.join(addresses), text)
-#         server.quit()
-#         return True
-#     except smtplib.SMTPException as e:  
-#         print("DEBUG ERROR SMPT: " + e)
-
-#         return False
+    def send(self, session_id, data):
+        file_send = data[0]
+        return {
+            "is_received": True,
+            "type": "live_agent",
+            "channel": "socket",
+            "data": [{"filename": data[0]}]
+        }
