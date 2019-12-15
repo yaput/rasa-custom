@@ -1,36 +1,44 @@
 import asyncio
 import json
+import logging
+import os
 import re
+import sys
 import threading
 import time
-import os, sys
+from hashlib import md5
+from urllib import parse
 
 from flask import Flask, Response, request
 from gevent.pywsgi import WSGIServer
 from geventwebsocket.handler import WebSocketHandler
 from geventwebsocket.websocket import WebSocketError
-from rasa.core.agent import Agent
-from rasa.core.channels import UserMessage
-from rasa.core.interpreter import RasaNLUInterpreter
-from rasa.utils.endpoints import EndpointConfig
-from rasa.core.tracker_store import MongoTrackerStore
-from rasa.core.domain import Domain
-
-from .config import load_config
-from .message import MessageExecutor
-
-from bl_core.facebook_parser import *
-
-from .tracker import Tracker
-from .user_map import (isPause, pause_user, send_message, store_user,
-                      user_map, UserTracker, update_lang)
-from urllib import parse
-from hashlib import md5
-
 from twilio.rest import Client
 from twilio.twiml.messaging_response import MessagingResponse
 
+from bl_core.facebook_parser import *
+from rasa.core.agent import Agent
+from rasa.core.channels import UserMessage
+from rasa.core.domain import Domain
+from rasa.core.interpreter import RasaNLUInterpreter
+from rasa.core.tracker_store import MongoTrackerStore
+from rasa.utils.endpoints import EndpointConfig
 
+from .config import load_config
+from .message import MessageExecutor
+from .tracker import Tracker
+from .user_map import (UserTracker, isPause, pause_user, send_message,
+                       store_user, update_lang, user_map)
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(name)s:%(message)s')
+
+file_handler = logging.FileHandler('~/logs/connection_interface.log')
+file_handler.setFormatter(formatter)
+
+logger.addHandler(file_handler)
 
 app = Flask(__name__)
 app.debug = True
@@ -41,14 +49,16 @@ message_exec = MessageExecutor()
 message_exec.load()
 
 config = load_config()
-host,port='0.0.0.0',config['websocket']['port']
-dashlog = Tracker(config['dashbot']['api'],config['dashbot'][config["template"]["module"]]['api_key'])
+host, port = '0.0.0.0', config['websocket']['port']
+dashlog = Tracker(config['dashbot']['api'], config['dashbot']
+                  [config["template"]["module"]]['api_key'])
 
 action_endpoint = EndpointConfig(url=config['server']['actions_endpoint'])
 nlg_endpoint = EndpointConfig(url=config['server']['nlg_endpoint'])
 domain = Domain.load('domain.yml')
 db_conf = config['bluelog']
-mongo_tracker = MongoTrackerStore(domain, host=db_conf['host'], db=db_conf['db'], username=db_conf['username'], password=db_conf['password'], auth_source=db_conf['authsource'], collection=config['template']['module'])
+mongo_tracker = MongoTrackerStore(domain, host=db_conf['host'], db=db_conf['db'], username=db_conf['username'],
+                                  password=db_conf['password'], auth_source=db_conf['authsource'], collection=config['template']['module'])
 
 agent_all = {}
 
@@ -119,7 +129,7 @@ class HandleFacebookMessage(threading.Thread):
         print(" this is t, ", t)
         slots = t.current_slot_values()
         print("this is the slots, ", slots)
-        if slots['language']== None:
+        if slots['language'] == None:
             slots['language'] = 'en'
         updated = update_lang(session_message, slots['language'])
         if self.used_message == "/restart" or self.used_message == "restart":
@@ -173,10 +183,8 @@ def handle_facebook_message():
                         used_message = None
                         pass
                     elif 'quick_reply' in msg_key:
-                        # print(message.get('quick_reply', None))
                         used_message = message['quick_reply']['payload']
                     elif 'text' in msg_key:
-                        # print(message.get('text', None))
                         used_message = message.get('text', None)
                     elif 'attachments' in msg_key:
                         pass
@@ -184,14 +192,17 @@ def handle_facebook_message():
                     used_message = postback['payload']
 
                 if used_message != None:
-                    agent_fb = load_facebook_agent(nlu_interpreter_en, nlg_endpoint, action_endpoint, mongo_tracker)
-                    task = HandleFacebookMessage(sender_id, used_message, agent_fb)
+                    agent_fb = load_facebook_agent(
+                        nlu_interpreter_en, nlg_endpoint, action_endpoint, mongo_tracker)
+                    task = HandleFacebookMessage(
+                        sender_id, used_message, agent_fb)
                     task.start()
 
         except Exception as e:
-            print('---debug error ----', e.args)
+            logger.exception('Facebook API Handler Error')
 
         return "success"
+
 
 @app.route("/whatsappAPI", methods=['POST'])
 def handle_whatsapp_messages():
@@ -207,18 +218,20 @@ def handle_whatsapp_messages():
             asyncio.set_event_loop(loop)
             if msg is not None or msg != " " or msg != "":
                 msgRasa = UserMessage(text=msg, sender_id=sender_id)
-                responses = loop.run_until_complete(agent_en.handle_message(msgRasa))
+                responses = loop.run_until_complete(
+                    agent_en.handle_message(msgRasa))
                 for response in responses:
-                    if numMedia>0:
+                    if numMedia > 0:
                         resp.message(response['text'])
-                        resp.message().media("thank-you-lettering.jpg") # Insert media link into the media function
+                        # Insert media link into the media function
+                        resp.message().media("thank-you-lettering.jpg")
                     else:
                         resp.message(response['text'])
                 return str(resp)
             else:
                 resp.message("Please Type Something")
         except Exception as e:
-            print('---debug error ----', e.args)
+            logger.exception('Whatsapp API Handler error')
         return "success"
 
 
@@ -228,7 +241,7 @@ def pause_bot():
     pause_id = req_data['userId']
     pause = req_data['paused']
     pause_user(pause_id, pause)
-    print(user_map)
+    logger.debug(f'User Map: {user_map}')
     return Response("OK")
 
 
@@ -236,11 +249,13 @@ def pause_bot():
 def liveperson():
     req_data = request.get_json()
     userID = req_data['userId']
-    dashlog.log("outgoing", None, userID,queryText=req_data['text'],intent_name='Human In The Loop')
+    dashlog.log("outgoing", None, userID,
+                queryText=req_data['text'], intent_name='Human In The Loop')
     if not isPause(userID):
         pause_user(userID)
     send_message(userID, req_data['text'])
     return Response("OK")
+
 
 @app.route("/hello")
 def hello():
@@ -253,7 +268,8 @@ def authorized_connection(environ):
             query = parse.parse_qs(environ['QUERY_STRING'])
             token = query.get('token', None)
             timestamp = query.get('timestamp', None)
-            hashed = md5((str(timestamp[0])+"THIS_IS_SECRET_KEY_PLEASE_KEEP_IT_AS_A_SECRET").encode())
+            hashed = md5(
+                (str(timestamp[0])+"THIS_IS_SECRET_KEY_PLEASE_KEEP_IT_AS_A_SECRET").encode())
             if token is not None and timestamp is not None:
                 if (hashed.hexdigest() == token[0]):
                     return True
@@ -261,23 +277,22 @@ def authorized_connection(environ):
         else:
             return True
     except Exception as e:
-        print(f"Can't authorized connection: {e.args}")
+        logger.debug(f"Can't authorized connection: {e.args}")
         return False
 
 
 def wsgi_app(environ, start_response):
-    path = environ["PATH_INFO"]  
+    path = environ["PATH_INFO"]
     if '/ws/' in path:
-        try:  
+        try:
             if authorized_connection(environ):
                 handle_websocket(environ["wsgi.websocket"], path)
             else:
                 raise Exception("Unauthorized")
         except Exception as e:
-            print(e)
-            print("Stop Connection")
+            logger.exception("Error Handling Websocket")
         return []
-    else:  
+    else:
         return app(environ, start_response)
 
 
@@ -298,7 +313,8 @@ def handle_websocket(websocket, path):
                     session_message = message['user']
                     store_user(session_message, websocket)
                     text_message = message['text']
-                    msgRasa = UserMessage(sender_id=session_message,text=text_message)
+                    msgRasa = UserMessage(
+                        sender_id=session_message, text=text_message)
                     if text_message == "/restart" or text_message == "restart":
                         pause_user(session_message, pause=False)
 
@@ -309,32 +325,38 @@ def handle_websocket(websocket, path):
                     update_lang(session_message, slots['language'])
 
                     if not isPause(session_message):
-                        responses = loop.run_until_complete(agent.handle_message(msgRasa))
+                        responses = loop.run_until_complete(
+                            agent.handle_message(msgRasa))
                         for response in responses:
                             log_message = ""
                             if 'text' in response.keys():
                                 log_message = response['text']
                             else:
-                                log_message = json.dumps(response['attachment'], indent=3)
-                            dashlog.log("outgoing", response,response['recipient_id'])
+                                log_message = json.dumps(
+                                    response['attachment'], indent=3)
+                            dashlog.log("outgoing", response,
+                                        response['recipient_id'])
                             time.sleep(1)
-                            websocket.send(json.dumps(message_exec.send_typing()))
+                            websocket.send(json.dumps(
+                                message_exec.send_typing()))
                             time.sleep(1.5)
                             parsed_message = message_exec.parse(response)
                             websocket.send(json.dumps(parsed_message))
                     else:
-                        dashlog.log("incoming", None, session_message,queryText=text_message,intent_name='Human In The Loop')
+                        dashlog.log("incoming", None, session_message,
+                                    queryText=text_message, intent_name='Human In The Loop')
             except KeyboardInterrupt:
                 sys.exit()
             except WebSocketError as ex:
-                print(ex)
+                logger.exception("Websocket Error")
     else:
         raise Exception(f"Agent not found, agent: {agent}")
-        
+
 
 if __name__ == '__main__':
     userTrack = UserTracker()
     userTrack.start()
-    http_server = WSGIServer((host,port), wsgi_app, handler_class=WebSocketHandler)
-    print('Server started at %s:%s'%(host,port))
+    http_server = WSGIServer((host, port), wsgi_app,
+                             handler_class=WebSocketHandler)
+    logger.info('Server started at %s:%s' % (host, port))
     http_server.serve_forever()
