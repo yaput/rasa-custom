@@ -6,6 +6,7 @@ import re
 import sys
 import threading
 import time
+import argparse
 from hashlib import md5
 from urllib import parse
 
@@ -30,8 +31,17 @@ from .tracker import Tracker
 from .user_map import (UserTracker, isPause, pause_user, send_message,
                        store_user, update_lang, user_map)
 
+parser = argparse.ArgumentParser(description='Start connection interface for blue logic chatbot')
+parser.add_argument('-vv','--debug', type=bool, help='Enable debug or not', nargs='?', const=True, default=False)
+args = parser.parse_args()
+
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+
+if args.debug:
+    logger.setLevel(logging.DEBUG)
+else:
+    logger.setLevel(logging.INFO)
+
 
 formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(name)s:%(message)s')
 
