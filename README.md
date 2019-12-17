@@ -1,3 +1,7 @@
+Install the library with
+```bash
+pip install git+https://gitlab.com/bluelogic/bl-core.git
+```
 Use python3.7 to run this.
 
 It will ask you to download english model for spacy. To do this you can use:
