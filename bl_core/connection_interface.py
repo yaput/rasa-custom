@@ -45,7 +45,7 @@ else:
 
 formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(name)s:%(message)s')
 
-file_handler = logging.FileHandler('~/logs/connection_interface.log')
+file_handler = logging.FileHandler('./connection_interface.log')
 file_handler.setFormatter(formatter)
 
 logger.addHandler(file_handler)
