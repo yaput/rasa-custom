@@ -30,7 +30,9 @@ from .message import MessageExecutor
 from .tracker import Tracker
 from .user_map import (UserTracker, isPause, pause_user, send_message,
                        store_user, update_lang, user_map)
+from .infobip_whatsapp import InfobipWhatsappIncomingMessage, InfobipWhatsappOutgoing
 
+loop = asyncio.new_event_loop()
 parser = argparse.ArgumentParser(description='Start connection interface for blue logic chatbot')
 parser.add_argument('-vv','--debug', type=bool, help='Enable debug or not', nargs='?', const=True, default=False)
 args = parser.parse_args()
@@ -224,8 +226,7 @@ def handle_whatsapp_messages():
             sender_id = request.values.get('From')
             numMedia = int(request.values.get('NumMedia'))
             resp = MessagingResponse()
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
+            asyncio.get_event_loop(loop)
             if msg is not None or msg != " " or msg != "":
                 msgRasa = UserMessage(text=msg, sender_id=sender_id)
                 responses = loop.run_until_complete(
@@ -271,6 +272,31 @@ def liveperson():
 def hello():
     return "OK"
 
+# Handler for Infobip 3rd party omnichannel chat
+@app.route('/infobip/whatsapp', methods=['GET', 'POST'])
+def infobip_whatsapp():
+    if request.method == 'GET':
+        return "OK INFO BIP WHATSAPP"
+    
+    if request.method == 'POST':
+        asyncio.get_event_loop(loop)
+        incoming_message = request.get_json()
+        wa_message = InfobipWhatsappIncomingMessage().parse_dict(incoming_message)
+        for wa_msg in wa_message.results:
+            msg_rasa = UserMessage(wa_msg.message.text, sender_id=wa_msg.sender_id)
+            responses = loop.run_until_complete(agent_en.handle_message(msg_rasa))
+            for response in responses:
+                m = InfobipWhatsappOutgoing()
+                m.scenario_key = ""
+                m.whatsapp_msg = response
+                m.sms = response
+                m.phone_number_to = wa_msg.sender_id
+                m.send()
+
+@app.route('/infobip/facebook', methods=['GET','POST'])
+def infobip_facebook():
+    if request.method == 'GET':
+        return "OK INFOBIP FACEBOOK MESSENGER"
 
 def authorized_connection(environ):
     try:
@@ -328,8 +354,8 @@ def handle_websocket(websocket, path):
                     if text_message == "/restart" or text_message == "restart":
                         pause_user(session_message, pause=False)
 
-                    loop = asyncio.new_event_loop()
-                    asyncio.set_event_loop(loop)
+                    
+                    asyncio.get_event_loop(loop)
                     t = loop.run_until_complete(agent.log_message(msgRasa))
                     slots = t.current_slot_values()
                     update_lang(session_message, slots['language'])

@@ -8,7 +8,7 @@ class BluebotMessage():
             To define request type for front end do it on send() method
         """
         pass
-
+    
     def send(self, session_id, data):
         """
             Send method, to send the result to front end as a request
