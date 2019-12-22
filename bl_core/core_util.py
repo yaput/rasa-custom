@@ -624,3 +624,24 @@ class PanelMessage(BluebotMessage):
             "type": "get_message",
             "data": data[0]
         }
+
+class VoiceandText(BluebotMessage):
+    """Send Voice and Text message"""
+
+    def type_name(self):
+        return "voice_text"
+
+    def send(self, session_id, data):
+        d = data[0]
+        payload = {
+            "is_received": True,
+            "type": "sound_tract",
+            "text": d['text'],
+            "channel": "socket",
+            "link": d['sound']
+        }
+
+        if 'replies' in d.keys():
+            payload['quick_replies'] = d['replies']
+
+        return payload
