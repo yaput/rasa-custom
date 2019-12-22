@@ -612,3 +612,15 @@ class IframeLiveAgent(BluebotMessage):
             "channel": "socket",
             "data": [{"filename": data[0]}]
         }
+
+class PanelMessage(BluebotMessage):
+    """Send Panel message for wide chat widget"""
+
+    def type_name(self):
+        return "get_message"
+
+    def send(self, session_id, data):
+        return {
+            "type": "get_message",
+            "data": data[0]
+        }
