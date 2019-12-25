@@ -20,6 +20,7 @@ class NLG():
         self.TYPE_SEARCHBAR = "search_bar"
         self.TYPE_CAROUSEL = "carousel"
         self.DEFAULT_ERROR_RESPONSE = 'utter_default_error'
+        self.TYPE_VOICE_TEXT = "voice_text"
 
         self.config = config
         with open('%s' % config["response"]["path"], encoding='utf8') as temp:
@@ -57,7 +58,6 @@ class NLG():
         try:
             return self.response_template[self._get_template()][lang]['content']
         except:
-            print(self._get_template())
             return self.response_template[self.DEFAULT_ERROR_RESPONSE][lang]['content']
 
     def _get_type(self, template, lang):
@@ -103,6 +103,8 @@ class NLG():
             return self._make_response(attachments=attachments)
         else:
             attachments = self._get_content(lang)
+            if attachments['type'] == self.TYPE_VOICE_TEXT:
+                attachments['elements'][0]['text'] = self._replace_template_with_value(attachments['elements'][0]['text'])
             return self._make_response(attachments=attachments)
 
     def _replace_template_with_value(self, template):
