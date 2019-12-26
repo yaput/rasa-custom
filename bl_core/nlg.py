@@ -118,10 +118,7 @@ class NLG():
                     template = re.sub(r'\{%s\}' % (m), slot[m], template)
             except Exception as e:
                 print(e.args)
-                print(template)
-                print(m)
-                print(slot[m])
-                print(slot)
+                template = re.sub(r'\{%s\}' % (m), 'undefined', template)
         
         return template
 
