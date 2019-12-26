@@ -110,15 +110,20 @@ class NLG():
     def _replace_template_with_value(self, template):
         slot = self._get_slots()
         match = re.findall(r'\{(.*?)\}', template)
-        text = template
         for m in match:
-            if m not in slot.keys():
-                text = template.replace(m, "undefined").replace(
-                    "{", "").replace("}", "")
-            else:
-                text = template.replace(m, slot[m]).replace(
-                    "{", "").replace("}", "")
-        return text
+            try:
+                if m not in slot.keys():
+                    template = re.sub(r'\{%s\}' % (m), 'undefined', template)
+                else:
+                    template = re.sub(r'\{%s\}' % (m), slot[m], template)
+            except Exception as e:
+                print(e.args)
+                print(template)
+                print(m)
+                print(slot[m])
+                print(slot)
+        
+        return template
 
     def _generate_attachment(self, content):
         data = {}
