@@ -22,6 +22,7 @@ class NLG():
         self.DEFAULT_ERROR_RESPONSE = 'utter_default_error'
         self.TYPE_VOICE_TEXT = "voice_text"
         self.TYPE_PANNEL_MESSAGE = "get_message"
+        self.DOWNLOAD_LINK = "download_link"
 
         self.config = config
         with open('%s' % config["response"]["path"], encoding='utf8') as temp:
@@ -107,6 +108,9 @@ class NLG():
             if attachments['type'] == self.TYPE_VOICE_TEXT:
                 attachments['elements'][0]['text'] = self._replace_template_with_value(attachments['elements'][0]['text'])
             
+            if attachments['type'] == self.DOWNLOAD_LINK or attachments['type'] == self.TYPE_TEXT:
+                attachments['elements'][0] = self._replace_template_with_value(attachments['elements'][0])
+
             if attachments['type'] == self.TYPE_PANNEL_MESSAGE:
                 for data in attachments['elements'][0]['data']:
                     for key in data:
