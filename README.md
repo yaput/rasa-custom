@@ -31,6 +31,29 @@ $ python -m spacy download en
 
 To start your project, you can download the default structure from `https://gitlab.com/bluelogic/clientinstance`
 Use the downloaded `clientinstance` and change the folder name as you want, then go inside the folder ex: `cd clientinstance` and run the 3 commands below.
+Or you can copy and paste below script and `chmod +x script_name.sh` then run it `./script_name.sh`
+```bash
+#!/bin/bash
+
+echo "Init Blue Logic Chatbot Structure"
+echo "What is the name of the project?"
+read project_name
+
+echo "Please tell me the repository URL"
+read repo_source
+
+git clone git@gitlab.com:bluelogic/clientinstance.git $project_name
+
+cd $project_name
+
+git remote rm origin
+
+git remote add origin $repo_source
+
+git remote -v
+
+ls
+```
 
 Some features are included in this module like logger into dashbot.io, persist the conversation into mongodb.
 
