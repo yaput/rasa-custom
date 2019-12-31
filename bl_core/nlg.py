@@ -21,6 +21,7 @@ class NLG():
         self.TYPE_CAROUSEL = "carousel"
         self.DEFAULT_ERROR_RESPONSE = 'utter_default_error'
         self.TYPE_VOICE_TEXT = "voice_text"
+        self.TYPE_PANNEL_MESSAGE = "get_message"
 
         self.config = config
         with open('%s' % config["response"]["path"], encoding='utf8') as temp:
@@ -105,6 +106,11 @@ class NLG():
             attachments = self._get_content(lang)
             if attachments['type'] == self.TYPE_VOICE_TEXT:
                 attachments['elements'][0]['text'] = self._replace_template_with_value(attachments['elements'][0]['text'])
+            
+            if attachments['type'] == self.TYPE_PANNEL_MESSAGE:
+                for data in attachments['elements'][0]['data']:
+                    for key in data:
+                        data[key] = self._replace_template_with_value(data[key]) 
             return self._make_response(attachments=attachments)
 
     def _replace_template_with_value(self, template):
