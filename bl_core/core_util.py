@@ -540,7 +540,7 @@ class Newlink(BluebotMessage):
 
 class Download(BluebotMessage):
     """
-        download was not present
+        download File
     """
 
     def type_name(self):

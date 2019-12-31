@@ -22,7 +22,7 @@ class NLG():
         self.DEFAULT_ERROR_RESPONSE = 'utter_default_error'
         self.TYPE_VOICE_TEXT = "voice_text"
         self.TYPE_PANNEL_MESSAGE = "get_message"
-        self.DOWNLOAD_LINK = "download_link"
+        self.DOWNLOAD_LINK = "download"
 
         self.config = config
         with open('%s' % config["response"]["path"], encoding='utf8') as temp:
