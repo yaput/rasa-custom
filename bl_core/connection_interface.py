@@ -200,21 +200,28 @@ def handle_whatsapp_messages():
     else:
         try:
             msg = request.values.get('Body')
+            print("this is the mssg, ",msg)
             sender_id = request.values.get('From')
             numMedia = int(request.values.get('NumMedia'))
             resp = MessagingResponse()
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             if msg is not None or msg != " " or msg != "":
-                msgRasa = UserMessage(text=msg, sender_id=sender_id)
-                responses = loop.run_until_complete(agent_en.handle_message(msgRasa))
-                for response in responses:
-                    if numMedia>0:
-                        resp.message(response['text'])
-                        resp.message().media("thank-you-lettering.jpg") # Insert media link into the media function
-                    else:
-                        resp.message(response['text'])
-                return str(resp)
+                print("status not ispaused", not isPause(sender_id))
+                if not isPause(sender_id):
+                    print("masuk sni")
+                    msgRasa = UserMessage(text=msg, sender_id=sender_id)
+                    responses = loop.run_until_complete(agent_en.handle_message(msgRasa))
+                    for response in responses:
+                        if numMedia>0:
+                            resp.message(response['text'])
+                            resp.message().media("thank-you-lettering.jpg") # Insert media link into the media function
+                        else:
+                            resp.message(response['text'])
+                    return str(resp)
+                else:
+                    dashlog.log("incoming", None, sender_id, queryText=msg,
+                                intent_name='Human In The Loop')
             else:
                 resp.message("Please Type Something")
         except Exception as e:
@@ -229,17 +236,34 @@ def pause_bot():
     pause = req_data['paused']
     pause_user(pause_id, pause)
     print(user_map)
+    print("bot paused")
     return Response("OK")
 
 
 @app.route("/liveperson", methods=["POST"])
 def liveperson():
     req_data = request.get_json()
+    print(req_data)
     userID = req_data['userId']
     dashlog.log("outgoing", None, userID,queryText=req_data['text'],intent_name='Human In The Loop')
     if not isPause(userID):
         pause_user(userID)
-    send_message(userID, req_data['text'])
+    if "whatsapp" in userID:
+        account_sid = 'ACdadbdbc85e5c76e3ff9ebe885f55d841'
+        auth_token = 'ef20d8fff2994788b79836c484ada85a'
+        client = Client(account_sid, auth_token)
+        user_number = 'whatsapp'+userID[9:]
+        print(user_number)
+        message = client.messages \
+            .create(
+            body=req_data['text'],
+            from_='whatsapp:+14155238886',
+            to='whatsapp:'+userID[9:]
+        )
+
+        print(message.sid)
+    else:
+        send_message(userID, req_data['text'])
     return Response("OK")
 
 @app.route("/hello")
@@ -287,12 +311,15 @@ def handle_websocket(websocket, path):
     agent = agent_all.get(lang, None)
     session_message = None
     if agent is not None:
+        print("this is agent, ", agent)
         if websocket is not None:
+            print("this is websocket, ", websocket)
             try:
                 while True:
                     msg = websocket.receive()
                     try:
                         message = json.loads(msg)
+                        print("this is message, ", message)
                     except:
                         break
                     session_message = message['user']

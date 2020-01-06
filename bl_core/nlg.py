@@ -24,6 +24,7 @@ class NLG():
         self.config = config
         with open('%s' % config["response"]["path"], encoding='utf8') as temp:
             self.response_template = json.load(temp)
+            print(self.response_template, " this is response_template")
         self.request_data = None
         return
 
