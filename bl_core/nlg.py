@@ -59,14 +59,14 @@ class NLG():
             return self.response_template['website'][self._get_template()][lang]['content']
         except:
             print(self._get_template())
-            return self.response_template[self.DEFAULT_ERROR_RESPONSE][lang]['content']
+            return self.response_template['website'][self.DEFAULT_ERROR_RESPONSE][lang]['content']
 
     def _get_content_whatsapp(self, lang):
         try:
             return self.response_template['whatsapp'][self._get_template()][lang]['content']
         except:
             print(self._get_template())
-            return self.response_template[self.DEFAULT_ERROR_RESPONSE][lang]['content']
+            return self.response_template['website'][self.DEFAULT_ERROR_RESPONSE][lang]['content']
 
     def _get_type_website(self, template, lang):
         return self._get_content_website(lang)['type']
