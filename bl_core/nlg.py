@@ -66,7 +66,7 @@ class NLG():
             return self.response_template['whatsapp'][self._get_template()][lang]['content']
         except:
             print(self._get_template())
-            return self.response_template['website'][self.DEFAULT_ERROR_RESPONSE][lang]['content']
+            return self.response_template['whatsapp'][self.DEFAULT_ERROR_RESPONSE][lang]['content']
 
     def _get_type_website(self, template, lang):
         return self._get_content_website(lang)['type']
@@ -126,7 +126,7 @@ class NLG():
             return self._make_response(attachments=attachments)
 
     def get_response_whatsapp(self, lang):
-        response_type = self._get_type_website(self._get_template(), lang)
+        response_type = self._get_type_whatsapp(self._get_template(), lang)
         if response_type == self.TYPE_TEXT:
             return self._make_response(text=self._replace_template_with_value(self._get_text_whatsapp(lang)))
         elif response_type == self.TYPE_API:
