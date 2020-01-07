@@ -115,14 +115,14 @@ class NLG():
         return self.request_data['tracker']['slots']
 
     def get_response_website(self, lang):
-        response_type = self._get_type(self._get_template(), lang)
+        response_type = self._get_type_website(self._get_template(), lang)
         if response_type == self.TYPE_TEXT:
-            return self._make_response(text=self._replace_template_with_value(self._get_text(lang)))
+            return self._make_response(text=self._replace_template_with_value(self._get_text_website(lang)))
         elif response_type == self.TYPE_API:
-            attachments = self._generate_attachment(self._get_content(lang))
+            attachments = self._generate_attachment(self._get_content_website(lang))
             return self._make_response(attachments=attachments)
         else:
-            attachments = self._get_content(lang)
+            attachments = self._get_content_website(lang)
             return self._make_response(attachments=attachments)
 
     def get_response_whatsapp(self, lang):
