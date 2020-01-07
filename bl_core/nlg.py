@@ -54,18 +54,31 @@ class NLG():
     def _is_texts(self, object):
         return
 
-    def _get_content(self, lang):
+    def _get_content_website(self, lang):
         try:
-            return self.response_template[self._get_template()][lang]['content']
+            return self.response_template['website'][self._get_template()][lang]['content']
         except:
             print(self._get_template())
             return self.response_template[self.DEFAULT_ERROR_RESPONSE][lang]['content']
 
-    def _get_type(self, template, lang):
-        return self._get_content(lang)['type']
+    def _get_content_whatsapp(self, lang):
+        try:
+            return self.response_template['whatsapp'][self._get_template()][lang]['content']
+        except:
+            print(self._get_template())
+            return self.response_template[self.DEFAULT_ERROR_RESPONSE][lang]['content']
 
-    def _get_elements(self, lang):
-        return self._get_content(lang)['elements']
+    def _get_type_website(self, template, lang):
+        return self._get_content_website(lang)['type']
+
+    def _get_type_whatsapp(self, template, lang):
+        return self._get_content_whatsapp(lang)['type']
+
+    def _get_elements_website(self, lang):
+        return self._get_content_website(lang)['elements']
+
+    def _get_elements_whatsapp(self, lang):
+        return self._get_content_whatsapp(lang)['elements']
 
     def _make_response(self, text="", buttons=[], image=None, attachments=None):
         response = {}
@@ -84,9 +97,15 @@ class NLG():
         response["intent"] = self.get_intent()
         return response
 
-    def _get_text(self, lang):
-        texts = self._get_elements(lang)
-        selected_text = ""
+    def _get_text_website(self, lang):
+        texts = self._get_elements_website(lang)
+        selected_text = texts[random.randint(
+            0, len(texts)-1) if len(texts) > 1 else 0]
+
+        return selected_text
+
+    def _get_text_whatsapp(self, lang):
+        texts = self._get_elements_whatsapp(lang)
         selected_text = texts[random.randint(
             0, len(texts)-1) if len(texts) > 1 else 0]
 
@@ -95,7 +114,7 @@ class NLG():
     def _get_slots(self):
         return self.request_data['tracker']['slots']
 
-    def get_response(self, lang):
+    def get_response_website(self, lang):
         response_type = self._get_type(self._get_template(), lang)
         if response_type == self.TYPE_TEXT:
             return self._make_response(text=self._replace_template_with_value(self._get_text(lang)))
@@ -104,6 +123,17 @@ class NLG():
             return self._make_response(attachments=attachments)
         else:
             attachments = self._get_content(lang)
+            return self._make_response(attachments=attachments)
+
+    def get_response_whatsapp(self, lang):
+        response_type = self._get_type_website(self._get_template(), lang)
+        if response_type == self.TYPE_TEXT:
+            return self._make_response(text=self._replace_template_with_value(self._get_text_whatsapp(lang)))
+        elif response_type == self.TYPE_API:
+            attachments = self._generate_attachment(self._get_content_whatsapp(lang))
+            return self._make_response(attachments=attachments)
+        else:
+            attachments = self._get_content_whatsapp(lang)
             return self._make_response(attachments=attachments)
 
     def _replace_template_with_value(self, template):
@@ -448,8 +478,11 @@ def nlg():
         lang = "en"
     dashlog.log("incoming", None, sender_id,
                 queryText=text, intent_name=intent)
-    response = n.get_response(lang)
-    return Response(json.dumps(response, indent=3), mimetype="application/json")
+    response_website = n.get_response_website(lang)
+    response_whatsapp = n.get_response_whatsapp(lang)
+    if "whatsapp" in sender_id:
+        return Response(json.dumps(response_whatsapp, indent=3), mimetype="application/json")
+    return Response(json.dumps(response_website, indent=3), mimetype="application/json")
 
 
 env = os.getenv("BLUELOGIC_ENV", "development")
