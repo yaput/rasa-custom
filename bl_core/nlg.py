@@ -480,6 +480,7 @@ def nlg():
                 queryText=text, intent_name=intent)
     response_website = n.get_response_website(lang)
     response_whatsapp = n.get_response_whatsapp(lang)
+    print(sender_id, "<<-- sender id")
     if "whatsapp" in sender_id:
         return Response(json.dumps(response_whatsapp, indent=3), mimetype="application/json")
     return Response(json.dumps(response_website, indent=3), mimetype="application/json")
