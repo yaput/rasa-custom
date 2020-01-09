@@ -107,6 +107,7 @@ class NLG():
             attachments = self._get_content(lang)
             if attachments['type'] == self.TYPE_VOICE_TEXT:
                 attachments['elements'][0]['text'] = self._replace_template_with_value(attachments['elements'][0]['text'])
+                attachments['elements'][0]['sound'] = self._replace_template_with_value(attachments['elements'][0]['sound'])
             
             if attachments['type'] == self.DOWNLOAD_LINK or attachments['type'] == self.TYPE_TEXT:
                 attachments['elements'][0] = self._replace_template_with_value(attachments['elements'][0])
