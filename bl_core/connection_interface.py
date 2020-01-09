@@ -119,9 +119,7 @@ class HandleFacebookMessage(threading.Thread):
         print(" this is t, ", t)
         slots = t.current_slot_values()
         print("this is the slots, ", slots)
-        if slots['language']== None:
-            slots['language'] = 'en'
-        updated = update_lang(session_message, slots['language'])
+        updated = update_lang(session_message, 'en')
         if self.used_message == "/restart" or self.used_message == "restart":
             pause_user(self.sender_id, pause=False)
 
