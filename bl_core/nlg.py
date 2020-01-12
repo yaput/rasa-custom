@@ -420,7 +420,8 @@ class NLG():
                         "label": labels[i],
                         "description": subtitle[i],
                         "image_type": "url",
-                        "image": images[i]
+                        "image": images[i],
+                        "id": i
                     }
                     card["buttons"] = buttons[i]
                     carousel.append(card)
