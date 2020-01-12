@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='bl_core',
-      version='1.4.7',
+      version='1.4.8',
       url='',
       author='Blue Logic',
       author_email='anton@bluelogic.ae',
