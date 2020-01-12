@@ -51,6 +51,10 @@ class Carousel(BluebotMessage):
         return "carousel"
 
     def send(self, session_id, data):
+        id_unique = 1
+        for d in data:
+            d['id'] = id_unique
+            id_unique += 1
         return {
             "type": "carousel",
             "text": "mainCarousel",
