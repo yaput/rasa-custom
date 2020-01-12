@@ -8,6 +8,7 @@ import json
 import random
 import requests
 import re
+import copy
 
 
 class NLG():
@@ -105,18 +106,19 @@ class NLG():
             return self._make_response(attachments=attachments)
         else:
             attachments = self._get_content(lang)
+            attc = copy.deepcopy(attachments)
             if attachments['type'] == self.TYPE_VOICE_TEXT:
-                attachments['elements'][0]['text'] = self._replace_template_with_value(attachments['elements'][0]['text'])
-                attachments['elements'][0]['sound'] = self._replace_template_with_value(attachments['elements'][0]['sound'])
+                attc['elements'][0]['text'] = self._replace_template_with_value(attc['elements'][0]['text'])
+                attc['elements'][0]['sound'] = self._replace_template_with_value(attc['elements'][0]['sound'])
             
-            if attachments['type'] == self.DOWNLOAD_LINK or attachments['type'] == self.TYPE_TEXT:
-                attachments['elements'][0] = self._replace_template_with_value(attachments['elements'][0])
+            if attc['type'] == self.DOWNLOAD_LINK or attc['type'] == self.TYPE_TEXT:
+                attc['elements'][0] = self._replace_template_with_value(attc['elements'][0])
 
-            if attachments['type'] == self.TYPE_PANNEL_MESSAGE:
-                for data in attachments['elements'][0]['data']:
+            if attc['type'] == self.TYPE_PANNEL_MESSAGE:
+                for data in attc['elements'][0]['data']:
                     for key in data:
                         data[key] = self._replace_template_with_value(data[key]) 
-            return self._make_response(attachments=attachments)
+            return self._make_response(attachments=attc)
 
     def _replace_template_with_value(self, template):
         slot = self._get_slots()
