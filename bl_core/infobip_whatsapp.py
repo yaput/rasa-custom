@@ -63,6 +63,7 @@ class InfobipWhatsappIncomingMessage:
         return self
 
 import requests
+from requests.auth import HTTPBasicAuth
 class InfobipWhatsappOutgoing:
     def __init__(self):
         self.scenario_key = ""
@@ -82,46 +83,42 @@ class InfobipWhatsappOutgoing:
             ],
             "whatsApp": {
                 "text": self.whatsapp_msg
-            },
-            "sms": {
-                "text": self.sms
             }
         }	
         return payload
 
-    def send(self):
-        payload = self.json()
-        url = ""
-        requests.post(url, json=payload)
+    def template_json(self):
+        payload = {
+            "scenarioKey": self.scenario_key,
+            "destinations": [
+                {
+                    "to": {
+                        "phoneNumber": self.phone_number_to
+                    }
+                }
+            ],
+            "whatsApp": {
+                "templateName": "infobip_test_hsm", # TODO: Change template name
+                "templateNamespace": "whatsapp:hsm:it:infobip", # TODO: Change template namespace
+                "templateData": [
+                    "Someone",
+                    "Bluelogic"
+                ], # TODO: change template data
+                "language": "en_GB"
+            }
+        }	
+        return payload
 
-# resp = {
-#   "results": [
-#     {
-#       "from": "385919998888",
-#       "to": "1234",
-#       "integrationType": "WHATSAPP",
-#       "receivedAt": "2019-07-19T11:23:26.998+0000",
-#       "messageId": "ABEGOFl3VCQoAhBalbc6rTQT6mgS29EmGZ7a",
-#       "pairedMessageId": None,
-#       "callbackData": None,
-#       "message": {
-#         "type": "TEXT",
-#         "text": "Support hello"
-#       },
-#       "contact": {
-#         "name": "Frank"
-#       },
-#       "price": {
-#         "pricePerMessage": 0,
-#         "currency": "EUR"
-#       }
-#     }
-#   ],
-#   "messageCount": 1,
-#   "pendingMessageCount": 0
-# }
+    def send(self, obj_message): 
+        url = "https://ej8yk3.api.infobip.com/omni/1/advanced" # TODO: Change URL 
+        return requests.post(url, json=obj_message, auth=HTTPBasicAuth('bltestinfobip', "Bluelogic#123")) # TODO: Change username and password
 
-# i = InfobipWhatsappIncomingMessage().parse_dict(resp)
-# for res in i.results:
-#     print(res.receiver_id)
-#     print(res.message_id)
+
+# Test Usage
+
+# m = InfobipWhatsappOutgoing()
+# m.scenario_key = "FB579BC2150650B35252D0894ED0C0F0"
+# m.phone_number_to = "971547657841"
+# m.whatsapp_msg = "Hey there"
+# print(m.send(m.template_json()).text) # For sending template
+# print(m.send(m.json()).text) # For sending free form
