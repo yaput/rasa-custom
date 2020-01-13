@@ -8,6 +8,7 @@ import json
 import random
 import requests
 import re
+import copy
 
 
 class NLG():
@@ -20,6 +21,9 @@ class NLG():
         self.TYPE_SEARCHBAR = "search_bar"
         self.TYPE_CAROUSEL = "carousel"
         self.DEFAULT_ERROR_RESPONSE = 'utter_default_error'
+        self.TYPE_VOICE_TEXT = "voice_text"
+        self.TYPE_PANNEL_MESSAGE = "get_message"
+        self.DOWNLOAD_LINK = "download"
 
         self.config = config
         with open('%s' % config["response"]["path"], encoding='utf8') as temp:
@@ -57,7 +61,6 @@ class NLG():
         try:
             return self.response_template[self._get_template()][lang]['content']
         except:
-            print(self._get_template())
             return self.response_template[self.DEFAULT_ERROR_RESPONSE][lang]['content']
 
     def _get_type(self, template, lang):
@@ -103,20 +106,34 @@ class NLG():
             return self._make_response(attachments=attachments)
         else:
             attachments = self._get_content(lang)
-            return self._make_response(attachments=attachments)
+            attc = copy.deepcopy(attachments)
+            if attachments['type'] == self.TYPE_VOICE_TEXT:
+                attc['elements'][0]['text'] = self._replace_template_with_value(attc['elements'][0]['text'])
+                attc['elements'][0]['sound'] = self._replace_template_with_value(attc['elements'][0]['sound'])
+            
+            if attc['type'] == self.DOWNLOAD_LINK or attc['type'] == self.TYPE_TEXT:
+                attc['elements'][0] = self._replace_template_with_value(attc['elements'][0])
+
+            if attc['type'] == self.TYPE_PANNEL_MESSAGE:
+                for data in attc['elements'][0]['data']:
+                    for key in data:
+                        data[key] = self._replace_template_with_value(data[key]) 
+            return self._make_response(attachments=attc)
 
     def _replace_template_with_value(self, template):
         slot = self._get_slots()
         match = re.findall(r'\{(.*?)\}', template)
-        text = template
         for m in match:
-            if m not in slot.keys():
-                text = template.replace(m, "undefined").replace(
-                    "{", "").replace("}", "")
-            else:
-                text = template.replace(m, slot[m]).replace(
-                    "{", "").replace("}", "")
-        return text
+            try:
+                if m not in slot.keys():
+                    template = re.sub(r'\{%s\}' % (m), 'undefined', template)
+                else:
+                    template = re.sub(r'\{%s\}' % (m), slot[m], template)
+            except Exception as e:
+                print(e.args)
+                template = re.sub(r'\{%s\}' % (m), 'undefined', template)
+        
+        return template
 
     def _generate_attachment(self, content):
         data = {}
@@ -403,7 +420,8 @@ class NLG():
                         "label": labels[i],
                         "description": subtitle[i],
                         "image_type": "url",
-                        "image": images[i]
+                        "image": images[i],
+                        "id": i
                     }
                     card["buttons"] = buttons[i]
                     carousel.append(card)

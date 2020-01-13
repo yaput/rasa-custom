@@ -51,6 +51,10 @@ class Carousel(BluebotMessage):
         return "carousel"
 
     def send(self, session_id, data):
+        id_unique = 1
+        for d in data:
+            d['id'] = id_unique
+            id_unique += 1
         return {
             "type": "carousel",
             "text": "mainCarousel",
@@ -540,7 +544,7 @@ class Newlink(BluebotMessage):
 
 class Download(BluebotMessage):
     """
-        download was not present
+        download File
     """
 
     def type_name(self):
@@ -612,3 +616,36 @@ class IframeLiveAgent(BluebotMessage):
             "channel": "socket",
             "data": [{"filename": data[0]}]
         }
+
+class PanelMessage(BluebotMessage):
+    """Send Panel message for wide chat widget"""
+
+    def type_name(self):
+        return "get_message"
+
+    def send(self, session_id, data):
+        return {
+            "type": "get_message",
+            "data": data[0]
+        }
+
+class VoiceandText(BluebotMessage):
+    """Send Voice and Text message"""
+
+    def type_name(self):
+        return "voice_text"
+
+    def send(self, session_id, data):
+        d = data[0]
+        payload = {
+            "is_received": True,
+            "type": "sound_tract",
+            "text": d['text'],
+            "channel": "socket",
+            "link": d['sound']
+        }
+
+        if 'replies' in d.keys():
+            payload['quick_replies'] = d['replies']
+
+        return payload
