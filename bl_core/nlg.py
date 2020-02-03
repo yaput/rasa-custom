@@ -123,7 +123,6 @@ class NLG():
                 attc['elements'][0]['text'] = self._replace_template_with_value(attc['elements'][0]['text'])
                 for data in attc['elements'][0]['replies']:
                     data['title'] = self._replace_template_with_value(data['title'])
-                    data['payload'] = self._replace_template_with_value(data['payload'])
 
             return self._make_response(attachments=attc)
 
