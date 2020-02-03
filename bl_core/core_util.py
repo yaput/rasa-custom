@@ -16,6 +16,7 @@ class QuickReplies(BluebotMessage):
         return {
             "text": data[0].get('text', ""),
             "quick_replies": data[0]['replies'],
+            "feedback": data[0].get('feedback', "false"),
             "channel": "socket",
             "user": session_id,
             "to": session_id,
