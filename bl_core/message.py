@@ -32,7 +32,10 @@ class MessageExecutor():
 
         
         try:
-            return self.methods[method_type].send(session_id, data, loc)
+            # TODO: Change this to use better way
+            if method_type == "carousel":
+                return self.methods[method_type].send(session_id, data, loc)
+            return self.methods[method_type].send(session_id, data)
         except Exception as e:
             return self.methods['text'].send(session_id, data) 
 
