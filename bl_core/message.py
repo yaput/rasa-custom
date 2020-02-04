@@ -25,13 +25,14 @@ class MessageExecutor():
         elif 'attachment' in request.keys():
             try:
                 data = request['attachment']['elements']
+                loc = request['attachment'].get('location', 'false')
                 method_type = request['attachment']['type']
             except:
                 pass
 
         
         try:
-            return self.methods[method_type].send(session_id, data)
+            return self.methods[method_type].send(session_id, data, loc)
         except Exception as e:
             return self.methods['text'].send(session_id, data) 
 
