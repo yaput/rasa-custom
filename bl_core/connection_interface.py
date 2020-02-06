@@ -72,6 +72,7 @@ try:
                                   generator=nlg_endpoint,
                                   tracker_store=mongo_tracker)
             agent_all["en"] = agent_en
+            print(agent_all)
         else:
             pass
         if os.path.isdir('./models/nlu/ar'):
