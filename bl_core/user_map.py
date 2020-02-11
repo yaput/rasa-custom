@@ -103,7 +103,7 @@ class UserTracker(threading.Thread):
         for t in trash:
             response = {
                 "recipient_id": t,
-                "attachment": template_message['utter_session_timeout'][user_map[t]['language']]['content']
+                "attachment": template_message['website']['utter_session_timeout'][user_map[t]['language']]['content']
             }
             try:
                 user_map[t]['conn'].send(json.dumps(message_exec.parse(response)))
