@@ -270,6 +270,12 @@ def send_new_link(session_id, data):
            }]
       }
 
+def send_new_searchbar(session_id, data):
+    return {
+           "type": "search_bar_new",
+           "data" : []
+      }
+
 def parse_bot_response(response):
     session_id = response['recipient_id']
     map_attachment_response = {
@@ -302,6 +308,7 @@ def parse_bot_response(response):
         "newlink": send_new_link,
         'send_nothing': send_nothing,
         "send_sound": send_sound,
+        "search_bar_new": send_new_searchbar
     }
     if 'text' in response.keys():
         return send_text(session_id, response['text'])
