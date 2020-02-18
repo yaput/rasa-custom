@@ -273,6 +273,7 @@ def send_new_link(session_id, data):
 def send_new_searchbar(session_id, data):
     return {
            "type": "search_bar_new",
+           "text": data[0]['text'],
            "data" : []
       }
 
