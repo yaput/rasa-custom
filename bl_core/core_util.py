@@ -274,7 +274,10 @@ def send_new_searchbar(session_id, data):
     return {
            "type": "search_bar_new",
            "text": data[0]['text'],
-           "data" : []
+           "data" : ["test"],
+           "is_received": True,
+           "input_disable": True,
+           "channel": "socket"
       }
 
 def parse_bot_response(response):
