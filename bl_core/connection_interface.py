@@ -332,7 +332,7 @@ def handle_websocket(websocket, path):
                     asyncio.set_event_loop(loop)
                     t = loop.run_until_complete(agent.log_message(msgRasa))
                     slots = t.current_slot_values()
-                    update_lang(session_message, slots['language'])
+                    update_lang(session_message, lang)
 
                     if not isPause(session_message):
                         responses = loop.run_until_complete(
